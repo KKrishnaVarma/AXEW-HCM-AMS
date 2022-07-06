@@ -1,0 +1,17 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000171806279,"
+/***************************************************************************************************
+Formula Name: WCC_HR_ADP_PAYROLL_FILE_NAME_FF
+Formula Type: Extract Rule
+Description : Fast formula to format run time file name attribute
+
+Org/Developer                         Date         		Comments
+----------------------------------------------------------------------------------------------------
+Deloitte/Karthikeya Andey	       	03/01/2021   	Initial version
+***************************************************************************************************/
+
+l_company_name = GET_PARAMETER_VALUE('Payroll_Company')
+
+rule_value = '_'||TRIM(l_company_name)
+
+RETURN rule_value"

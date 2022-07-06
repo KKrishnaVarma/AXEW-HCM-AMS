@@ -1,0 +1,39 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000320668441,"
+/* ******************************************************************
+ * Formula Name     : AXE_HR_ALI_USER_GET_GEOGRAPHY_MATRIX_UDT_FF
+ * Formula Type     : Extract Rule
+ * Description      : Returns GEOGRAPHY Code if present in ""AXEW_HCM_LEGISLATION_CODE_TO_GEOGRAPHY_MATRIX_UDT"" .
+ *
+ * Change History
+ * --------------
+ *
+ * Name 	                               Ver      Date         Description
+ *-----------------------------------     ------   ------------ ------------
+   Sai Prathap Reddy                       1.0	   2022-JUNE-20  Initial Draft
+************************************************************************** */
+DEFAULT FOR DATA_ELEMENTS IS EMPTY_TEXT_TEXT
+
+INPUTS ARE DATA_ELEMENTS (TEXT_TEXT)
+
+UDT_COL_VALUE='X'
+
+IF (DATA_ELEMENTS.EXISTS('Legislation_Code')) 
+THEN(LEG_CODE = DATA_ELEMENTS['Legislation_Code']
+	UDT_COL_VALUE = GET_TABLE_VALUE('AXEW_HCM_LEGISLATION_CODE_TO_GEOGRAPHY_MATRIX_UDT','GEOGRAPHY',LEG_CODE,'X')
+	
+	log =ess_log_write('l_LEG_CODE'||LEG_CODE  )
+	log =ess_log_write('l_UDT_COL_VALUE'||UDT_COL_VALUE  )
+	
+	IF UDT_COL_VALUE = 'X' THEN
+		(
+		RULE_VALUE = ' '
+		)
+	ELSE
+		(
+		RULE_VALUE = UDT_COL_VALUE
+		)
+
+RETURN RULE_VALUE
+)
+"

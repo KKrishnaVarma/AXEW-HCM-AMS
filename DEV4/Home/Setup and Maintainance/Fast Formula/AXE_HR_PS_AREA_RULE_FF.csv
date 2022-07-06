@@ -1,0 +1,46 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000036915615,"
+/* ******************************************************************
+ * Formula Name     : AXE_HR_PS_AREA_RULE_FF
+ * Formula Type     : Extract Rule
+ * Input            : PSHR Legacy P&L Location
+ * Returns          : Returns value from the UDT column ""PS_AREA"" if exists
+ *
+ * Change History
+ * --------------
+ *
+ * Name 	                               Ver      Date         Description
+ *-----------------------------------     ------   ------------ ------------
+   Abu Thahir                             1.0	   2019-May-15  Initial Draft
+************************************************************************** */
+
+
+DEFAULT FOR DATA_ELEMENTS IS EMPTY_TEXT_TEXT
+
+INPUTS ARE DATA_ELEMENTS (TEXT_TEXT)
+
+TRACE_FLAG = 'N'
+UDT_COL_VALUE='X'
+
+IF (DATA_ELEMENTS.EXISTS('Legacy_PL_Location')) THEN
+(
+S_LEG_PL_LOC = DATA_ELEMENTS['Legacy_PL_Location']
+
+	IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE('Legacy P&L Location(Attribute3) : '|| S_LEG_PL_LOC ))
+
+	UDT_COL_VALUE = GET_TABLE_VALUE('AXE_HCM_PL_LOCATION_MATRIX_UDT','PS_AREA',S_LEG_PL_LOC,'X') 
+
+	IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' UDT - PS_AREA : '|| UDT_COL_VALUE ))
+
+
+	IF UDT_COL_VALUE = 'X' THEN
+		(
+		RULE_VALUE = ' '
+		)
+	ELSE
+		(
+		RULE_VALUE = UDT_COL_VALUE
+		)
+
+RETURN RULE_VALUE
+)"

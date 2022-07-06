@@ -1,0 +1,34 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000094084369,"
+/* ******************************************************************
+ * Formula Name     : AXE_HR_ASS_ATTRIBUTE6_DESC_FF
+ * Formula Type     : Extract Rule
+ * Description      : Returns the ASS_ATTRIBUTE6 desc
+ *
+ * Change History
+ * --------------
+ *
+ * Name 	                          Ver      Date              Description
+ *-----------------------------------     ------   ------------ ------------
+   Manish                            1.0	   2021-April-26    Initial Draft
+************************************************************************** */
+
+
+DEFAULT FOR DATA_ELEMENTS IS EMPTY_TEXT_TEXT
+
+INPUTS ARE DATA_ELEMENTS (TEXT_TEXT)
+
+TRACE_FLAG = 'N'
+RULE_VALUE = ' '
+
+IF DATA_ELEMENTS.EXISTS('ASS_ATTRIBUTE6') THEN
+(
+ASS_ATTRIBUTE6_CODE = DATA_ELEMENTS['ASS_ATTRIBUTE6']
+
+
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE('ASS_ATTRIBUTE6 : '||ASS_ATTRIBUTE6_CODE))
+RULE_VALUE = GET_LOOKUP_MEANING('AXEW_BRANCH_ID',ASS_ATTRIBUTE6_CODE)           
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' Attribute6 Desc : '||RULE_VALUE ))
+)
+
+RETURN RULE_VALUE"

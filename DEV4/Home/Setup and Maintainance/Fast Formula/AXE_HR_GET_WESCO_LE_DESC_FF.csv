@@ -1,0 +1,36 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000266700401,"
+/* ******************************************************************
+ * Formula Name     : AXE_HR_GET_WESCO_LE_DESC_FF
+ * Formula Type     : Extract Rule
+ * Description      : Returns the WESCO Legal Employer Name description from lookup for Concur interface
+ *
+ * Change History
+ * --------------
+ *
+ * Name 	                               Ver      Date         Description
+ *-----------------------------------     ------   ------------ ------------
+   Manish Chauhan                         1.0	   07-Dec-2021  Initial Draft
+************************************************************************** */
+
+
+DEFAULT FOR DATA_ELEMENTS IS EMPTY_TEXT_TEXT
+
+INPUTS ARE DATA_ELEMENTS (TEXT_TEXT)
+
+TRACE_FLAG = 'N'
+S_LE_NAME = ' '
+RULE_VALUE = ' '
+
+IF (DATA_ELEMENTS.EXISTS('Legal_Entity')) THEN
+(
+	S_LE_NAME = DATA_ELEMENTS['Legal_Entity']
+
+	IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' Legal_Entity : '||S_LE_NAME))
+	
+    RULE_VALUE = GET_VALUE_SET('AXE_HR_WESCO_LE_DESCRIPTION_VS','|=S_LE_NAME='''||S_LE_NAME||'''')	
+	
+	IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' Department Description : '||RULE_VALUE ))
+
+	RETURN RULE_VALUE
+) "

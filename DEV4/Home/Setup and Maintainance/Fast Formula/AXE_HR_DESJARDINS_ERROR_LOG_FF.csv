@@ -1,0 +1,96 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000036915592,"
+/* ******************************************************************
+ * Formula Name     : AXE_HR_DESJARDINS_ERROR_LOG_FF
+ * Rice ID          : HCM_I039 - Desjardins interface 
+ * Formula Type     : Extract Rule
+ * Description      : Returns Error log details 
+ *
+ * Change History
+ * --------------
+ *
+ * Name 	                               Ver      Date         Description
+ *-----------------------------------     ------   ------------ ------------
+   Srinivas Thurakapalli                    1.0	   2019-May-29  Initial Draft
+************************************************************************** */
+
+
+DEFAULT  FOR DATA_ELEMENTS IS EMPTY_TEXT_TEXT
+DEFAULT  FOR PER_ASG_NORMAL_HOURS IS 0
+
+INPUTS ARE DATA_ELEMENTS      (TEXT_TEXT)
+
+l_leg_code= ' '
+l_rule_value= ' '
+l_send_to_extract = ' '
+l_person_age = ' '
+l_perm_temp = ' '
+l_union_code = ' '
+l_person_age_num = 0
+l_log_message1= ' '
+l_log_message2= ' '
+l_log_message3= ' '
+l_log_message4 = ' '
+l_log_message5 = ' '
+l_log_message= ' ' 
+l_union_name = ' '
+
+IF(DATA_ELEMENTS.EXISTS('Legal_Employer_Name')) THEN
+(	l_legal_emp=DATA_ELEMENTS['Legal_Employer_Name'])
+
+
+IF(DATA_ELEMENTS.EXISTS('Legislative_Code')) THEN
+(	l_leg_code=DATA_ELEMENTS['Legislative_Code'])
+
+
+IF(DATA_ELEMENTS.EXISTS('Permanent_Temporary')) THEN
+(	l_perm_temp=DATA_ELEMENTS['Permanent_Temporary'])
+
+
+IF(DATA_ELEMENTS.EXISTS('Union_Code')) THEN
+(	l_union_name=DATA_ELEMENTS['Union_Code']
+l_union_code=SUBSTR(l_union_name,1,3))
+
+
+IF(DATA_ELEMENTS.EXISTS('Assignment_Status_Type')) THEN
+(	l_status_code=DATA_ELEMENTS['Assignment_Status_Type'])
+
+IF(DATA_ELEMENTS.EXISTS('Person_Age')) THEN
+(	l_person_age=DATA_ELEMENTS['Person_Age']
+IF l_person_age <> ' ' THEN 
+(l_person_age_num=TO_NUMBER(l_person_age)))
+
+IF(DATA_ELEMENTS.EXISTS('send_to_extract')) THEN
+(	l_send_to_extract=DATA_ELEMENTS['send_to_extract'])
+
+ IF (l_send_to_extract ='N') THEN
+(
+ IF ( l_leg_code <> 'CA' ) THEN
+( l_log_message1 = ' other than CA legislative code : '||l_legal_emp)
+ 
+  if ( PER_ASG_NORMAL_HOURS < 20 ) THEN
+( l_log_message2 = ',not fall under normal hours : '||TO_CHAR(PER_ASG_NORMAL_HOURS))
+ 
+ 
+ if (l_person_age_num > 70 ) THEN
+( l_log_message3 = ',greater than 70 : '||TO_CHAR(l_person_age_num))
+
+
+ if ( l_perm_temp <>'R' ) THEN
+( l_log_message4 =',not Regular : '||l_perm_temp)
+
+
+ if ( l_union_code = '702' OR l_union_code = '419' ) THEN
+( l_log_message5 = ',have Union code : '||l_union_code)
+
+
+
+
+l_log_message=l_log_message1||l_log_message2||l_log_message3||l_log_message4||l_log_message5
+)
+RULE_VALUE=l_log_message
+
+RETURN RULE_VALUE
+ 
+ 
+"

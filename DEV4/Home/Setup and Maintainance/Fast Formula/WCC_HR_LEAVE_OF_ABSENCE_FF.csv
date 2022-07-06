@@ -1,0 +1,25 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000171806291,"
+/***************************************************************************************************
+Formula Name: WCC_HR_LEAVE_OF_ABSENCE_FF
+Formula Type: Extract Rule
+Description : Fast Formula to fetch Leave of Absence from Person EITs
+Org/Developer                         Date         		Comments
+----------------------------------------------------------------------------------------------------
+Deloitte/Karthikeya Andey	       	4/01/2021   		Initial version
+***************************************************************************************************/
+l_leave_of_absence	 	= ' '
+l_person_id         	= GET_CONTEXT(PERSON_ID,1)
+l_person_id_ch      	= TO_CHAR(l_person_id)
+l_effective_date 		= TRUNC(GET_CONTEXT(EFFECTIVE_DATE, '0001/01/01 00:00:00'(date)))
+l_effective_date_ch		= TO_CHAR(l_effective_date)
+
+l_leave_of_absence 		= GET_VALUE_SET('WCC_HR_LEAVE_OF_ABSENCE_VS', '|=PER_ID='
+								||l_person_id_ch
+								||'|EFF_DATE='
+								||l_effective_date_ch
+								||'|')
+
+rule_value = TRIM(l_leave_of_absence)				
+
+RETURN rule_value"

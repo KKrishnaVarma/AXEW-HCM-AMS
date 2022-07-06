@@ -1,0 +1,26 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000063997106,"
+/*****************************************************************
+FORMULA NAME: AXE_HCM_COMP_JOB_FAMILY_FF 
+FORMULA TYPE: Compensation Default and Override
+DESCRIPTION : Fast Formula to return Job Family name
+LEGISLATIVE DATA GROUP: <blank>
+
+Name           Date       Description
+-------------------------------------------------------------------
+Rishi Tiwari  12-MAY-2020  Initial Version
+
+*****************************************************************/
+
+DEFAULT FOR PER_JOB_FAMILY_NAME IS 'NULL'
+
+L_DEFAULT_VALUE = ' '
+L_DATA_TYPE = 'CHAR'
+
+
+IF PER_JOB_FAMILY_NAME WAS NOT DEFAULTED THEN
+      (
+       L_DEFAULT_VALUE = PER_JOB_FAMILY_NAME
+       )
+      
+RETURN L_DATA_TYPE, L_DEFAULT_VALUE "

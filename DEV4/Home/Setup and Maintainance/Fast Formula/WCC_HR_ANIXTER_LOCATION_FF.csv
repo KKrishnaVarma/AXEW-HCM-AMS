@@ -1,0 +1,25 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000171806284,"
+/***************************************************************************************************
+Formula Name: WCC_HR_ANIXTER_LOCATION_FF
+Formula Type: Extract Rule
+Description : Fetches Location Name using Location Code
+Org/Developer                         Date         		Comments
+----------------------------------------------------------------------------------------------------
+Deloitte/Karthikeya Andey	       	1/22/2021   	Initial version
+***************************************************************************************************/
+DEFAULT FOR PER_ASG_ATTRIBUTE3 IS ' '
+
+l_location_code	= ' '
+l_location_name	= ' '
+
+IF PER_ASG_ATTRIBUTE3 WAS NOT DEFAULTED 
+THEN 
+(
+	l_location_code = PER_ASG_ATTRIBUTE3
+	l_location_name = GET_TABLE_VALUE('AXE_HCM_PL_LOCATION_MATRIX_UDT', 'PS_PL_LOCATION_NAME', TRIM(l_location_code), ' ')
+)
+
+RULE_VALUE = TRIM(l_location_name)
+
+RETURN RULE_VALUE"

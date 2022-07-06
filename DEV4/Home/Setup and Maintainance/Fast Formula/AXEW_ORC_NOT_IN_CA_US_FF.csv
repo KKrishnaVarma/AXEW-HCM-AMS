@@ -1,0 +1,31 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000159808225,"
+/*************************************************************************************
+Formula Name:  AXEW_ORC_NOT_IN_CA_US_FF
+FORMULA TYPE:  Participation And Rate Eligibility
+DESCRIPTION:   Returns Y if candidate Country is not US and CA
+Org/Developer                         Date         		Comments
+----------------------------------------------------------------------------------------------------
+Deloitte/Karthikeya Andey	    6/22/2021   	Initial version
+***************************************************************************************************/
+
+/*** Default : Database Items ***/
+DEFAULT FOR PER_ASG_LOC_COUNTRY IS ' '
+
+l_eligible	= 'Y'
+
+IF PER_ASG_LOC_COUNTRY WAS NOT DEFAULTED 
+THEN 
+(
+	l_country = PER_ASG_LOC_COUNTRY
+	
+	IF (l_country = 'US' or l_country = 'CA')
+	THEN
+	(
+		l_eligible = 'N'
+	)
+)
+
+ELIGIBLE = l_eligible
+
+RETURN ELIGIBLE"

@@ -1,0 +1,133 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000036915593,"
+/******************************************************************************
+FORMULA NAME : AXE_HR_DESJARDINS_DIVISIONNAME_FF
+FORMULA TYPE : Extract Rule
+DESCRIPTION  : Calculations for Division Name in Desjardins Interface
+********************************************************************************
+Change History:
+Name                      Ver    Date           Description
+-------------            -----   -----------     --------------------------------------------
+Srinivas Thurakapalli  	 1.0     27-MAY-2019    Initial Version
+********************************************************************************/
+
+DEFAULT FOR DATA_ELEMENTS IS EMPTY_TEXT_TEXT
+INPUTS ARE DATA_ELEMENTS      (TEXT_TEXT)
+
+rule_value=' '
+l_div_name = ' '
+ 
+l_union = ' '
+l_pay_group = ' '
+l_work_province = ' '
+l_legal_emp = ' '
+l_start_date= ' '
+l_start_date_dt ='1900-01-01T00:00:00.000Z' (DATE)
+l_end_date_dt ='1900-01-01T00:00:00.000Z' (DATE) 
+l_end_date = ' '
+l_context_Code = ' '
+l_Person_Extra_Info = ' '
+l_Person_Extra_Info1 = ' '
+l_pay_to_date = ' '
+l_pay_to_date_dt ='1900-01-01T00:00:00.000Z' (DATE) 
+l_actual_term_date = ' '
+l_person_info_date2 = ' '
+l_union_code = ' '
+l_pay_group_code = ' '
+IF(DATA_ELEMENTS.EXISTS('Legal_Employer_Name')) THEN 
+(l_legal_emp=DATA_ELEMENTS['Legal_Employer_Name'])
+
+
+IF(DATA_ELEMENTS.EXISTS('Union_Code')) THEN 
+(l_union=DATA_ELEMENTS['Union_Code']
+ l_union_code=SUBSTR(l_union,1,3))
+
+									
+
+IF(DATA_ELEMENTS.EXISTS('Paygroup')) THEN 
+(l_pay_group_code=DATA_ELEMENTS['Paygroup']
+l_pay_group=SUBSTR(DATA_ELEMENTS['Paygroup'],1,3)
+)
+				 
+
+
+IF(DATA_ELEMENTS.EXISTS('Employee_Province')) THEN 
+(l_work_province=DATA_ELEMENTS['Employee_Province'])
+
+										  
+										 
+
+IF(DATA_ELEMENTS.EXISTS('Override_Start_date')) THEN
+(	l_start_date=DATA_ELEMENTS['Override_Start_date']
+l_start_date_dt = TO_DATE(SUBSTR(l_start_date,1,10),'YYYY/MM/DD'))
+
+																	  
+
+
+IF(DATA_ELEMENTS.EXISTS('Override_End_date')) THEN
+(	l_end_date=DATA_ELEMENTS['Override_End_date']
+l_end_date_dt = TO_DATE(SUBSTR(l_end_date,1,10),'YYYY/MM/DD'))
+
+IF(DATA_ELEMENTS.EXISTS('Context_Code')) THEN
+(	l_context_Code=DATA_ELEMENTS['Context_Code'])
+
+IF(DATA_ELEMENTS.EXISTS('Person_Extra_Info1')) THEN
+(	l_Person_Extra_Info=DATA_ELEMENTS['Person_Extra_Info1']
+l_Person_Extra_Info1 = SUBSTR(l_Person_Extra_Info,1,3))
+
+
+IF(DATA_ELEMENTS.EXISTS('Person_Info_Date2')) THEN
+(	l_person_info_date2=DATA_ELEMENTS['Person_Info_Date2'])
+
+
+l_effective_date=GET_CONTEXT(EFFECTIVE_DATE, '4712-12-31T00:00:00.000Z' (DATE))
+
+IF (l_legal_emp='Anixter Canada Inc.' AND (l_union_code = ' ' or l_union_code = '979') AND (l_pay_group = 'SBW' OR l_pay_group='HWK') AND l_work_province <> 'QC') THEN   
+(l_div_name = '5413780001-100')
+	
+IF (l_legal_emp='Anixter Canada Inc.' AND  (l_pay_group = 'SBW' OR l_pay_group='HWK') AND (l_work_province = 'QC' OR l_union_code = 'MON' )) THEN   
+(l_div_name = '5413780001-105')
+
+IF (l_legal_emp='Anixter Canada Inc.' AND l_union_code = '362'  ) THEN   
+(l_div_name = '5413780001-100')
+
+IF (l_legal_emp='Anixter Canada Inc.' AND l_union_code = '213'  ) THEN   
+(l_div_name = '5413780001-103')
+ 
+IF (l_legal_emp='Anixter Power Solutions Canada Inc. (formerly HD Supply Canada Inc.)' AND (l_union_code = ' ' or l_union_code = '979')  AND (l_pay_group = 'PBW' OR l_pay_group='PWK') ) THEN   
+(l_div_name = '5413780003-100')
+
+
+IF (l_legal_emp='Anixter Power Solutions Canada Inc. (formerly HD Supply Canada Inc.)' AND l_union_code = '362'   ) THEN   
+(l_div_name = '5413780003-100')
+
+IF (l_legal_emp='Anixter Power Solutions Canada Inc. (formerly HD Supply Canada Inc.)' AND l_union_code = '213'   ) THEN   
+(l_div_name = '5413780003-103')
+
+
+ IF l_context_Code <>' ' THEN
+(
+IF (l_legal_emp='Anixter Canada Inc.' AND (l_start_date_dt <= l_effective_date  AND l_end_date_dt >= l_effective_date) AND l_Person_Extra_Info1 ='101' ) THEN   
+(l_div_name = '5413780001-101')
+IF (l_legal_emp='Anixter Canada Inc.' AND (l_start_date_dt <= l_effective_date AND l_end_date_dt >= l_effective_date) AND l_Person_Extra_Info1 ='102' ) THEN   
+(l_div_name = '5413780001-102')
+IF (l_legal_emp='Anixter Canada Inc.' AND (l_start_date_dt <= l_effective_date AND l_end_date_dt >= l_effective_date) AND l_Person_Extra_Info1 ='004' ) THEN   
+(l_div_name = '5413780001-004')
+IF (l_legal_emp='Anixter Canada Inc.' AND (l_start_date_dt <= l_effective_date AND l_end_date_dt >= l_effective_date) AND l_Person_Extra_Info1 ='107' ) THEN   
+(l_div_name = '541378Q001-107')
+IF (l_legal_emp='Anixter Canada Inc.' AND (l_start_date_dt <= l_effective_date AND l_end_date_dt >= l_effective_date) AND l_Person_Extra_Info1 ='106' ) THEN   
+(l_div_name = '541378R001-106')
+
+IF (l_legal_emp='Anixter Power Solutions Canada Inc. (formerly HD Supply Canada Inc.)' AND (l_start_date_dt <= l_effective_date AND l_end_date_dt >= l_effective_date) AND l_Person_Extra_Info1 ='016' ) THEN   
+(l_div_name = '5413780003-016')
+
+IF (l_legal_emp='Anixter Power Solutions Canada Inc. (formerly HD Supply Canada Inc.)' AND (l_start_date_dt <= l_effective_date AND l_end_date_dt >= l_effective_date) AND l_Person_Extra_Info1 ='106' ) THEN   
+(l_div_name = '5413780003-106')
+
+IF (l_legal_emp='Anixter Power Solutions Canada Inc. (formerly HD Supply Canada Inc.)' AND (l_start_date_dt <= l_effective_date AND l_end_date_dt >= l_effective_date) AND l_Person_Extra_Info1 ='102' ) THEN   
+(l_div_name = '5413780003-102')
+)
+
+rule_value = l_div_name
+
+RETURN rule_value"

@@ -1,0 +1,26 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000036915661,"
+/* ******************************************************************
+ * Formula Name     : AXE_RC_PURGE_USER_DATE_FF
+ * Formula Type     : Extract Rule
+ * Description      : Returns the Effective Date + 1
+ *
+ * Change History
+ * --------------
+ *
+ * Name 	                          Ver      Date          Description
+ *-----------------------------------     ------   ------------ ------------
+   Aditya Patial                     1.0	   2019-July-22  Initial Draft
+************************************************************************** */
+
+DEFAULT FOR DATA_ELEMENTS IS EMPTY_TEXT_TEXT
+
+INPUTS ARE DATA_ELEMENTS (TEXT_TEXT)
+
+RULE_VALUE = '0001/01/01'
+
+l_eff_date = GET_CONTEXT(EFFECTIVE_DATE,to_date('1950/01/01 00:00:00'))
+
+RULE_VALUE = TO_CHAR(ADD_DAYS(l_eff_date,1),'YYYY-MM-DD')
+
+RETURN RULE_VALUE"

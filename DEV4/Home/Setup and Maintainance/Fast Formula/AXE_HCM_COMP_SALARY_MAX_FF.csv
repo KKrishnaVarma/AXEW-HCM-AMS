@@ -1,0 +1,37 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000249152022,"
+/*****************************************************************************************
+Deloitte Changes Log
+******************************************************************************************
+FORMULA NAME: AXE_HCM_COMP_SALARY_MAX_FF
+FORMULA TYPE: Compensation Default and Override
+DESCRIPTION : This formula determines the Salary MAX for Annual Salary Review Plan                                        
+Name             Date                  Comments
+------------------------------------------------------------------------------------------
+Rajni Bhardwaj   08-Nov-2021           Initial Version
+******************************************************************************************/
+
+default for CMP_ASSIGNMENT_SALARY_BASIS_NAME is 'XX'
+default for PER_ASG_JOB_CODE is 'XX'
+default for PER_ASG_LOC_ATTRIBUTE1 is '1'
+
+l_data_type = 'NUMBER'
+l_sal_basis = UPPER(RTRIM(REPLACE(REPLACE(CMP_ASSIGNMENT_SALARY_BASIS_NAME,' (','_'),' ','_'),')'))
+l_job_code = PER_ASG_JOB_CODE
+l_sal_max_udt = 0
+l_salary_max = 0
+l_us_ldg_id = 0
+
+l_us_ldg_id = to_number(GET_VALUE_SET('AXE_HCM_COMP_LDG_ID_VS'))
+CHANGE_CONTEXTS(LEGISLATIVE_DATA_GROUP_ID = l_us_ldg_id)
+(
+ l_sal_max_udt = to_number(GET_TABLE_VALUE('AXE_HCM_COMP_SALARY_MAX_UDT', l_sal_basis, l_job_code, '0'))
+)
+
+l_loc_sal_med_factor = to_number(PER_ASG_LOC_ATTRIBUTE1)
+l_salary_max = l_sal_max_udt*l_loc_sal_med_factor
+									   
+l_default_value = l_salary_max  
+
+return l_data_type, l_default_value
+"

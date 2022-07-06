@@ -1,0 +1,226 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000063997103,"
+/*****************************************************************
+FORMULA NAME: AXE_HCM_COMP_SALARY_PLAN_ELIGIBILITY_FF 
+FORMULA TYPE: Participation and Rate Eligibility
+DESCRIPTION : Fast Formula to determine the eligibility for Annual Salary review plan 
+LEGISLATIVE DATA GROUP: <blank>
+
+Name             Date       Description
+-------------------------------------------------------------------
+Rishi Tiwari    12-MAY-2020  Initial Version
+Sai Subhalaxmi  09-NOV-2021  Added Updated Logic V1
+*****************************************************************/
+DEFAULT FOR PER_ASG_REL_DATE_START                    IS '01-JAN-1951' (Date)
+DEFAULT FOR CMP_IV_PLAN_START_DATE                    IS '1951/01/01' (Date)
+DEFAULT FOR CMP_IV_PLAN_END_DATE                      IS '4712/12/31' (Date)
+DEFAULT FOR PER_ASG_STATUS_USER_STATUS                IS 'XXX'
+DEFAULT FOR PER_ASG_LEGISLATION_CODE                  IS 'NULL'
+DEFAULT FOR L_PLAN_START_DATE                         IS '1951/01/01' (Date)
+DEFAULT FOR CMP_ASSIGNMENT_SALARY_ANNUAL_AMOUNT       IS 0
+DEFAULT FOR PER_ASG_UNION_NAME                        IS 'XXX'
+DEFAULT FOR PER_ASG_ORG_LEGAL_EMPLOYER_NAME           IS 'XXX'
+DEFAULT FOR PER_ASG_ASSIGNMENT_TYPE                   IS 'X'
+DEFAULT FOR PER_ASG_ASSIGNMENT_ID                     IS 0
+DEFAULT FOR PER_ASG_PERSON_NUMBER                     IS 'XXX'
+DEFAULT FOR CMP_ASSIGNMENT_SALARY_ANNUAL_AMOUNT       IS 0
+DEFAULT FOR CMP_ASSIGNMENT_SALARY_DATE_FROM           IS '4712/12/31 00:00:00' (DATE)
+DEFAULT FOR CMP_ASSIGNMENT_SALARY_DATE_TO             IS '4712/12/31 00:00:00' (DATE)
+
+INPUTS ARE CMP_IV_PLAN_START_DATE (Date), CMP_IV_PLAN_END_DATE (Date)
+
+ELIGIBLE            = 'N'
+l_exclude_leg_emp   = 'N'
+l_exclude_union     = 'N'
+l_us_ldg_id         = 0
+RET                 = ' '
+l_asg_id            = PER_ASG_ASSIGNMENT_ID
+l_debug_flag        = 'N'
+
+IF CMP_IV_PLAN_START_DATE WAS NOT DEFAULTED THEN
+(  RET = ESS_LOG_WRITE('(Not Defaulted) CMP_IV_PLAN_START_DATE ---'|| to_char(CMP_IV_PLAN_START_DATE)) 
+   L_PLAN_START_DATE = CMP_IV_PLAN_START_DATE
+   RET = ESS_LOG_WRITE('L_PLAN_START_DATE ---'|| to_char(L_PLAN_START_DATE))
+) 
+ELSE
+(  RET = ESS_LOG_WRITE('(Defaulted) CMP_IV_PLAN_START_DATE ---'|| to_char(CMP_IV_PLAN_START_DATE))
+   L_PLAN_START_DATE = get_context(EFFECTIVE_DATE, '2020/01/01 00:00:00' (date))  
+   RET = ESS_LOG_WRITE('L_PLAN_START_DATE ---'|| to_char(L_PLAN_START_DATE)) 
+)
+
+RET = ESS_LOG_WRITE('CMP_IV_PLAN_END_DATE ---'|| to_char(CMP_IV_PLAN_END_DATE))
+
+/*V1 Changes Begins*/
+l_nxt_year       = TO_CHAR(TO_NUMBER(TO_CHAR(CMP_IV_PLAN_END_DATE, 'YYYY')) + 1)
+
+/*L_CUTOFF_DATE = TO_DATE(('10/01/'||to_char((to_number(TO_CHAR(CMP_IV_PLAN_END_DATE,'YYYY'))-1))),'MM/DD/YYYY') */
+
+L_CUTOFF_DATE    = TO_DATE(l_nxt_year||'/01/10','YYYY/MM/DD')  
+IF (l_debug_flag = 'Y')THEN
+(
+RET    = ESS_LOG_WRITE('L_CUTOFF_DATE ---'||to_char(L_CUTOFF_DATE))
+l_data = SET_LOG('L_CUTOFF_DATE	       : '||TO_CHAR(L_CUTOFF_DATE))
+)
+/*V1 Changes Ends*/
+
+/*Exclude based on hire cut-off date */ 
+IF PER_ASG_REL_DATE_START WAS NOT DEFAULTED AND PER_ASG_REL_DATE_START <= L_CUTOFF_DATE Then
+(
+ /*Exclude based on Assignment status*/
+  IF (l_debug_flag = 'Y')THEN
+  (
+  l_data          = SET_LOG('PER_ASG_STATUS_USER_STATUS	       : '||PER_ASG_STATUS_USER_STATUS)
+  )
+  IF PER_ASG_STATUS_USER_STATUS <> 'Inactive - Payroll Eligible' AND PER_ASG_STATUS_USER_STATUS <> 'Inactive - No Payroll' AND 
+  PER_ASG_STATUS_USER_STATUS <> 'Inactive with Severance - Payroll Eligible' Then
+  (
+     ELIGIBLE = 'Y'
+  )  
+ /* ELSE IF PER_ASG_STATUS_USER_STATUS = 'Leave - Payroll Eligible' OR  Then
+  ( 
+     ELIGIBLE = 'Y'
+  )*/
+)
+ELSE
+(
+  ELIGIBLE='N'
+)
+
+/* Exclude commission employees with Zero salary in the system */
+IF CMP_ASSIGNMENT_SALARY_ANNUAL_AMOUNT WAS DEFAULTED OR CMP_ASSIGNMENT_SALARY_ANNUAL_AMOUNT = 0 THEN
+(
+  ELIGIBLE='N'
+)
+
+l_eff_date1          = GET_CONTEXT(EFFECTIVE_DATE, '0001/01/01 00:00:00'(date))
+
+IF (l_debug_flag = 'Y')THEN
+(
+l_data         = SET_LOG('l_eff_date1	       : '||TO_CHAR(l_eff_date1))
+l_data         = SET_LOG('CMP_ASSIGNMENT_SALARY_ANNUAL_AMOUNT	       : '||TO_CHAR(CMP_ASSIGNMENT_SALARY_ANNUAL_AMOUNT))
+)
+/*IF (PER_ASG_UNION_NAME = '419: Teamsters Local 419 - P00700' OR PER_ASG_UNION_NAME = '702: I.B.E.W. 702 Mattoon, IL' OR PER_ASG_UNION_NAME = 'MON: Montreal Nonunion Agreement' OR PER_ASG_UNION_NAME = '003: Intl Brthrhd (461,608,805)' OR PER_ASG_UNION_NAME = '053: IBEW Local 53 KC' OR PER_ASG_UNION_NAME = '117: Drvrs, Sls, & Whse Wrkrs(125)' OR PER_ASG_UNION_NAME = '213: IBEW - Local 213 - P00703' OR PER_ASG_UNION_NAME = '362: Teamsters Local 362 - P00705' OR PER_ASG_UNION_NAME = '853: Teamsters - Local 853(154)' OR PER_ASG_UNION_NAME = '979: Teamsters Local 979 - P00706') THEN
+(
+ ELIGIBLE='N'
+)*/
+
+l_us_ldg_id = to_number(GET_VALUE_SET('AXE_HCM_COMP_LDG_ID_VS'))
+CHANGE_CONTEXTS(LEGISLATIVE_DATA_GROUP_ID = l_us_ldg_id)
+(
+ l_exclude_leg_emp = GET_TABLE_VALUE('AXE_HCM_COMP_SALARY_ELIGIBILITY_EXCLUDE_UDT','LEGAL_EMPLOYER',UPPER(PER_ASG_ORG_LEGAL_EMPLOYER_NAME),'N')
+ l_exclude_union   = GET_TABLE_VALUE('AXE_HCM_COMP_SALARY_ELIGIBILITY_EXCLUDE_UDT','UNION_CODES',TRIM(UPPER(PER_ASG_UNION_NAME)),'N')
+)
+
+IF (l_exclude_leg_emp = 'Y' OR l_exclude_union = 'Y') THEN
+(
+ ELIGIBLE = 'N'
+)
+IF (l_debug_flag = 'Y')THEN
+(
+l_data = SET_LOG('PER_ASG_UNION_NAME	               : '||UPPER(PER_ASG_UNION_NAME))
+l_data = SET_LOG('PER_ASG_ORG_LEGAL_EMPLOYER_NAME	   : '||PER_ASG_ORG_LEGAL_EMPLOYER_NAME)
+l_data = SET_LOG('l_exclude_union	                   : '||l_exclude_union)
+l_data = SET_LOG('PER_ASG_UNION_NAME TRIMMED	       : '||TRIM(UPPER(PER_ASG_UNION_NAME)))
+)
+IF (PER_ASG_ASSIGNMENT_TYPE <> 'E') THEN
+(
+ ELIGIBLE = 'N'
+)
+
+/*V1 Changes Begins*/
+CHANGE_CONTEXTS(LEGISLATIVE_DATA_GROUP_ID = l_us_ldg_id)
+(
+ l_exclude_Prsn_nmbr = GET_TABLE_VALUE('AXE_HCM_COMP_SALARY_ELIGIBILITY_EXCLUDE_UDT','PERSON_NUMBER',UPPER(PER_ASG_PERSON_NUMBER),'N')
+)
+
+IF (l_exclude_Prsn_nmbr = 'Y') THEN
+(
+ ELIGIBLE = 'N'
+)
+IF (l_debug_flag = 'Y')THEN
+(
+l_data = SET_LOG('PER_ASG_PERSON_NUMBER	       : '||PER_ASG_PERSON_NUMBER)
+l_data = SET_LOG('l_exclude_Prsn_nmbr	       : '||l_exclude_Prsn_nmbr)
+)
+
+
+CHANGE_CONTEXTS(EFFECTIVE_DATE= L_CUTOFF_DATE,HR_ASSIGNMENT_ID=l_asg_id)
+( 
+l_sal_strt_dt = CMP_ASSIGNMENT_SALARY_DATE_FROM
+l_sal_end_dt  = CMP_ASSIGNMENT_SALARY_DATE_TO
+)
+
+l_eff_date      = ADD_DAYS(L_CUTOFF_DATE, -1)
+l_new_eff_date  = ADD_DAYS(l_sal_end_dt, 1)
+
+IF (l_debug_flag = 'Y')THEN
+(
+l_data         = SET_LOG('l_sal_strt_dt	       : '||TO_CHAR(l_sal_strt_dt))
+l_data         = SET_LOG('l_sal_end_dt         : '||TO_CHAR(l_sal_end_dt))
+l_data         = SET_LOG('l_eff_date	       : '||TO_CHAR(l_eff_date))
+l_data         = SET_LOG('l_new_eff_date	   : '||TO_CHAR(l_new_eff_date))
+)
+CHANGE_CONTEXTS(EFFECTIVE_DATE= l_new_eff_date,HR_ASSIGNMENT_ID=l_asg_id)
+(
+	l_new_amount   = CMP_ASSIGNMENT_SALARY_ANNUAL_AMOUNT
+	IF (l_debug_flag  = 'Y')THEN
+    (
+	l_data         = SET_LOG('l_new_amount	       : '||TO_CHAR(l_new_amount))
+	)
+)
+CHANGE_CONTEXTS(EFFECTIVE_DATE= L_CUTOFF_DATE,HR_ASSIGNMENT_ID=l_asg_id)
+(
+	l_old_amount  = CMP_ASSIGNMENT_SALARY_ANNUAL_AMOUNT
+	IF (l_debug_flag = 'Y')THEN
+    (
+	l_data        = SET_LOG('l_old_amount	       : '||TO_CHAR(l_old_amount))
+	)
+)
+
+IF (l_new_amount = 0) THEN
+(
+l_new_amount   = l_old_amount
+IF (l_debug_flag = 'Y')THEN
+(
+l_data         = SET_LOG('l_new_amount INSIDE IF	       : '||TO_CHAR(l_new_amount))
+)
+)
+
+IF (l_old_amount <> l_new_amount)THEN
+(
+    ELIGIBLE = 'N'
+	IF (l_debug_flag = 'Y')THEN
+    (
+	l_data   = SET_LOG('ELIGIBLE INSIDE IF	       : '||ELIGIBLE)
+	)
+)
+/*
+CHANGE_CONTEXTS(HR_ASSIGNMENT_ID=l_asg_id,END_DATE=l_plan_end_date,START_DATE= L_CUTOFF_DATE) /*Changing context
+(
+   WHILE (CMP_ASSIGNMENT_SALARY_RGE_SALARY_ID.EXISTS(l_counter)) LOOP 
+   (  
+    l_hst_eff_start_dt        = CMP_ASSIGNMENT_SALARY_RGE_DATE_FROM[l_counter]
+	l_hst_eff_end_dt          = CMP_ASSIGNMENT_SALARY_RGE_DATE_TO[l_counter]
+	   
+	CHANGE_CONTEXTS(EFFECTIVE_DATE= l_hst_eff_start_dt,HR_ASSIGNMENT_ID=l_asg_id)
+    (
+	   l_new_amount   = CMP_ASSIGNMENT_SALARY_ANNUAL_AMOUNT
+	   l_data         = SET_LOG('l_new_amount	       : '||TO_CHAR(l_new_amount))
+	)
+	CHANGE_CONTEXTS(EFFECTIVE_DATE= l_eff_date,HR_ASSIGNMENT_ID=l_asg_id)
+    (
+	   l_old_amount  = CMP_ASSIGNMENT_SALARY_ANNUAL_AMOUNT
+	   l_data        = SET_LOG('l_old_amount	       : '||TO_CHAR(l_old_amount))
+	)
+	IF (l_old_amount <> l_new_amount)THEN
+	(
+      ELIGIBLE = 'N'
+	  l_data   = SET_LOG('ELIGIBLE INSIDE IF	       : '||ELIGIBLE)
+	  EXIT
+    )
+	l_counter = l_counter + 1
+   )
+)*/
+/*V1 Changes Ends*/
+  
+RETURN ELIGIBLE "

@@ -1,0 +1,55 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000168532946,"
+/***************************************************************************************************
+Formula Name: WCC_HR_GLOBOFORCE_MANAGER_ORG_FF
+Formula Type: Extract Rule
+Description : Fetches Manager Organization
+Org/Developer				Date			Comments
+----------------------------------------------------------------------------------------------------
+Deloitte/Karthikeya Andey		8/11/2021		Initial version
+***************************************************************************************************/
+DEFAULT FOR DATA_ELEMENTS IS EMPTY_TEXT_TEXT
+DEFAULT FOR PER_ASG_ORG_LEGAL_EMPLOYER_NAME  IS ' '
+DEFAULT FOR PER_LEGAL_EMPLOYER_NAME  IS ' '
+
+INPUTS ARE DATA_ELEMENTS (TEXT_TEXT)
+
+l_rule_value		= ' '
+l_manager_asg_id	= ' '
+ 
+l_legal_employer	= ' '
+l_lookup			= ' '
+l_effective_date	= TRUNC(GET_CONTEXT(EFFECTIVE_DATE, '0001/01/01 00:00:00'(date)))
+
+
+IF(DATA_ELEMENTS.EXISTS('Manager_Assignment_Id')) THEN
+(
+	l_manager_asg_id = DATA_ELEMENTS['Manager_Assignment_Id']
+	
+	CHANGE_CONTEXTS(HR_ASSIGNMENT_ID = TO_NUMBER(l_manager_asg_id), EFFECTIVE_DATE = l_effective_date)
+	(
+		IF PER_ASG_ORG_LEGAL_EMPLOYER_NAME WAS NOT DEFAULTED
+		THEN 
+		(	
+			l_legal_employer 			= PER_ASG_ORG_LEGAL_EMPLOYER_NAME
+			l_lookup   					= GET_VALUE_SET('WCC_HR_LOOKUP_CODE_VS', '|=P_LOOKUP_TYPE='
+														||'WCC_HR_WESCO_LEGAL_EMP_LKP'
+														||'|P_LOOKUP_CODE='
+														||l_legal_employer
+														||'|')										
+			IF l_lookup||'abc' = 'abc' 
+			THEN
+			(
+				l_rule_value = 'Anixter'
+			)
+			ELSE
+			(
+				l_rule_value = 'Wesco'
+			)
+		)
+	)
+)
+
+RULE_VALUE = TRIM(l_rule_value)
+
+RETURN RULE_VALUE"

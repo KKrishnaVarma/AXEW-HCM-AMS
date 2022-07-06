@@ -1,0 +1,51 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000036915626,"
+/* ******************************************************************
+ * Formula Name     : AXE_HR_PERSON_WORK_EMAIL_RULE_FF
+ * Formula Type     : Extract Rule
+ * Description      : To get the Work Email for the Person ID  
+ *
+ * Change History
+ * --------------
+ *
+ * Name 	                               Ver      Date         Description
+ *-----------------------------------     ------   ------------ ------------
+   Srinivas Thurakapalli                    1.0	   2019-Oct-10  Initial Draft
+***************************************************************************** */
+
+
+default_data_value for PER_EXT_EMAIL_EMAIL_TYPE is 'null'
+default_data_value for PER_EXT_EMAIL_EMAIL_ADDRESS is 'null'
+DEFAULT FOR DATA_ELEMENTS IS EMPTY_TEXT_TEXT
+DEFAULT FOR PER_SYS_DATE_TIME IS  'DUMMY' 
+INPUTS ARE DATA_ELEMENTS      (TEXT_TEXT)
+
+TRACE_FLAG = 'N'
+L_PERSON_ID = 0
+
+E_PERSON_ID = DATA_ELEMENTS['Person_ID']
+L_PERSON_ID = TO_NUMBER(E_PERSON_ID)
+L_EXT_DATE = '1901/01/01 00:00:00' (date)
+if (DATA_ELEMENTS.EXISTS('Person_ID')) then
+(
+  I = 1
+  L_EXT_DATE=LAST_DAY(TO_DATE(SUBSTR(PER_SYS_DATE_TIME,1,10),'YYYY-MM-DD'))
+  CHANGE_CONTEXTS(PERSON_ID = L_PERSON_ID ,EFFECTIVE_DATE= L_EXT_DATE)
+  (
+  WHILE PER_EXT_EMAIL_EMAIL_TYPE.EXISTS(I) LOOP
+  (
+  	IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' Inside While Loop '))
+    email_type = PER_EXT_EMAIL_EMAIL_TYPE[I]
+    rule_value = PER_EXT_EMAIL_EMAIL_ADDRESS[I]
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' WOrk EmailID: '||rule_value))
+    if (email_type= 'W1') then
+    (
+       RETURN rule_value
+	   EXIT
+    )
+    I = I + 1
+  )
+  )
+)
+
+"

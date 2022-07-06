@@ -1,0 +1,28 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000171806300,"
+/***************************************************************************************************
+Formula Name: WCC_HR_SUNLIFE_NEW_RECORD_FLAG_FF
+Formula Type: Extract Rule
+Description : Extracts Sunlife CA Retiree New Record Flag
+Org/Developer                         Date         		Comments
+----------------------------------------------------------------------------------------------------
+Deloitte/Karthikeya Andey	       	4/24/2021   		Initial version
+***************************************************************************************************/
+l_rule_value		= ' '
+
+l_effective_date	= TRUNC(GET_CONTEXT(EFFECTIVE_DATE, '0001/01/01 00:00:00'(date)))
+l_effective_date_ch	= TO_CHAR(l_effective_date)
+
+l_assginment_id		= GET_CONTEXT(HR_ASSIGNMENT_ID,1)
+l_assginment_id_ch	= TO_CHAR(l_assginment_id)
+
+
+l_rule_value		= GET_VALUE_SET('WCC_HR_SUNLIFE_NEW_RECORD_FLAG_VS', '|=ASG_ID='
+								||l_assginment_id_ch
+								||'|EFF_DATE='
+								||l_effective_date_ch
+								||'|')
+
+rule_value = TRIM(l_rule_value)
+
+RETURN rule_value"

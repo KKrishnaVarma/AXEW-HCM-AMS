@@ -1,0 +1,38 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000171806309,"
+/***************************************************************************************************
+Formula Name: WCC_HR_SUNLIFE_COA_MATRIX_FF
+Formula Type: Extract Rule
+Description : Fetches Budget Location and Branch details
+Org/Developer                         Date         		Comments
+----------------------------------------------------------------------------------------------------
+Deloitte/Karthikeya Andey	       	4/24/2021   		Initial version
+***************************************************************************************************/
+DEFAULT FOR PER_ASG_ATTRIBUTE6 IS ' '
+DEFAULT FOR PER_ASG_ATTRIBUTE7 IS ' '
+
+l_rule_value		= ' '
+l_branch_id			= ' '
+l_branch			= ' '
+l_budget_location	= ' '
+
+
+IF PER_ASG_ATTRIBUTE7 WAS NOT DEFAULTED 
+THEN 
+(
+	l_budget_location = PER_ASG_ATTRIBUTE7
+)
+	
+IF PER_ASG_ATTRIBUTE6 WAS NOT DEFAULTED
+THEN 
+(
+	l_branch_id = PER_ASG_ATTRIBUTE6	
+	l_branch    = GET_LOOKUP_MEANING('AXEW_BRANCH_ID',l_branch_id)
+)
+
+l_rule_value = TRIM(l_budget_location)||'^'||TRIM(l_branch)
+
+RULE_VALUE = TRIM(l_rule_value)
+
+RETURN RULE_VALUE
+"

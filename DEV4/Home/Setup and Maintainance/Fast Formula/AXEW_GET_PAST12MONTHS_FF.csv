@@ -1,0 +1,27 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000181698988,"
+/* ******************************************************************************
+FORMULA NAME: AXEW_GET_PAST12MONTHS_FF
+FORMULA TYPE: Extract Rule
+DESCRIPTION : Get last 12 months from cutoff date
+Change History:
+Name                 Date                      Comments
+--------------------------------------------------------------------------------
+Manish              30-April-2021            Initial Version
+******************************************************************************/ 
+DEFAULT FOR DATA_ELEMENTS   IS EMPTY_TEXT_TEXT
+INPUTS ARE DATA_ELEMENTS (TEXT_TEXT)
+
+
+l_last_day_month =  '0001/01/01 00:00:00'(date)
+RULE_VALUE= ' '
+
+l_effective_date = GET_PARAMETER_VALUE_DATE('Cutoff_Date')
+
+
+
+l_last_day_month= add_months(l_effective_date,-12)
+RULE_VALUE = TO_CHAR(l_last_day_month)
+
+RETURN RULE_VALUE
+"

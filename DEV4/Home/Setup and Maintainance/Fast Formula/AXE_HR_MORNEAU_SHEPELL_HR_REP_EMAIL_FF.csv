@@ -1,0 +1,65 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000069450375,"
+/*******************************************************************
+ * Formula Name     : AXE_HR_MORNEAU_SHEPELL_HR_REP_EMAIL_FF
+ * INCEDENT Number  : INC0402233 
+ * Formula Type     : Extract Rule
+ * Description      : AXE HR Morneau Shepell fast formula to fetch HR_REP PERSON_EMAIL for INCLUDE_TOP_HIER_NODE=Y
+ * Change History
+ * --------------
+ * Name 	                               Ver      Date         Description
+ *-----------------------------------     ------   ------------ ------------
+   Vibha Sorte                             1.0	   2020-Nov-11  Initial Draft
+******************************************************************************/
+
+default_data_value for PER_EXT_EMAIL_EMAIL_TYPE is 'NULL'
+default_data_value for PER_EXT_EMAIL_EMAIL_ADDRESS is 'NULL'
+DEFAULT FOR DATA_ELEMENTS IS EMPTY_TEXT_TEXT
+DEFAULT FOR PER_SYS_DATE_TIME IS  'DUMMY' 
+INPUTS ARE DATA_ELEMENTS      (TEXT_TEXT)
+
+TRACE_FLAG = 'N'
+L_PERSON_ID = '0'
+RET = 'XX'
+email_type = 'A'
+L_EMAIL = 'X' 
+
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' AXE_HR_MORNEAU_SHEPELL_HR_REP_EMAIL_FF - Starts' ))
+IF DATA_ELEMENTS.EXISTS('AOR_HR_REP_PERSON_ID') THEN 
+(
+E_PERSON_ID = DATA_ELEMENTS['AOR_HR_REP_PERSON_ID']
+L_PERSON_ID = E_PERSON_ID
+L_EXT_DATE = '1901/01/01 00:00:00' (date)
+
+IF (DATA_ELEMENTS.EXISTS('AOR_HR_REP_PERSON_ID')) then
+(
+  I = 1
+  L_EXT_DATE=TO_DATE(SUBSTR(PER_SYS_DATE_TIME,1,10),'YYYY-MM-DD')
+  CHANGE_CONTEXTS(PERSON_ID = TO_NUMBER(L_PERSON_ID) ,EFFECTIVE_DATE= L_EXT_DATE)
+  (
+  WHILE PER_EXT_EMAIL_EMAIL_TYPE.EXISTS(I) LOOP
+  (
+    IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' Inside While Loop '))
+    email_type = PER_EXT_EMAIL_EMAIL_TYPE[I]
+    L_EMAIL = PER_EXT_EMAIL_EMAIL_ADDRESS[I]
+ 
+    IF (email_type= 'W1') then
+    (
+        IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' Work EmailID: '||L_EMAIL))
+        rule_value = L_EMAIL
+	   EXIT
+    )
+    I = I + 1
+  )
+  )
+)
+
+)
+
+
+IF L_EMAIL = 'X' THEN
+(
+RULE_VALUE = ' '
+)
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' AXE_HR_MORNEAU_SHEPELL_HR_REP_EMAIL_FF - Ends' )) 
+ RETURN RULE_VALUE"

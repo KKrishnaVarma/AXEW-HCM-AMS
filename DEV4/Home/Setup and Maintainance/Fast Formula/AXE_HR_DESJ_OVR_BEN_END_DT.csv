@@ -1,0 +1,67 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000036915597,"
+/******************************************************************************
+FORMULA NAME : AXE_HR_DESJ_OVR_BEN_END_DT
+FORMULA TYPE : Extract Rule
+DESCRIPTION  : Calculations for Override Hire date in Desjardins Interface
+********************************************************************************
+Change History:
+Name                      Ver    Date           Description
+-------------            -----   -----------     --------------------------------------------
+Srinivas Thurakapalli  	 1.0     27-MAY-2019    Initial Version
+********************************************************************************/
+
+DEFAULT FOR DATA_ELEMENTS IS EMPTY_TEXT_TEXT
+INPUTS ARE DATA_ELEMENTS      (TEXT_TEXT)
+
+rule_value=' '
+
+ 
+l_start_date= ' '
+l_start_date_dt ='1900-01-01T00:00:00.000Z' (DATE)
+l_end_date_dt ='1900-01-01T00:00:00.000Z' (DATE) 
+l_end_date = ' '
+l_context_Code = ' '
+l_Person_Extra_Info1 = ' '
+l_person_info_date1 = ' '
+l_person_info_date2 = ' '
+
+
+
+
+IF(DATA_ELEMENTS.EXISTS('Override_Start_date')) THEN
+(	l_start_date=DATA_ELEMENTS['Override_Start_date']
+l_start_date_dt = TO_DATE(SUBSTR(l_start_date,1,10),'YYYY/MM/DD'))
+
+
+
+IF(DATA_ELEMENTS.EXISTS('Override_End_date')) THEN
+(	l_end_date=DATA_ELEMENTS['Override_End_date']
+l_end_date_dt = TO_DATE(SUBSTR(l_end_date,1,10),'YYYY/MM/DD'))
+
+IF(DATA_ELEMENTS.EXISTS('Context_Code')) THEN
+(	l_context_Code=DATA_ELEMENTS['Context_Code'])
+
+IF(DATA_ELEMENTS.EXISTS('Person_Extra_Info1')) THEN
+(	l_Person_Extra_Info1=DATA_ELEMENTS['Person_Extra_Info1'])
+
+
+
+
+IF(DATA_ELEMENTS.EXISTS('Person_Info_Date1')) THEN
+(	l_person_info_date1=DATA_ELEMENTS['Person_Info_Date1'])
+
+IF(DATA_ELEMENTS.EXISTS('Person_Info_Date2')) THEN
+(	l_person_info_date2=DATA_ELEMENTS['Person_Info_Date2'])
+
+
+l_effective_date=GET_CONTEXT(EFFECTIVE_DATE, '4712-12-31T00:00:00.000Z' (DATE))
+
+ IF l_context_Code <>' ' THEN
+(
+IF ( (l_start_date_dt <= l_effective_date  AND l_end_date_dt >= l_effective_date) AND l_context_Code ='AXE_CA_CONTEXT_4' ) THEN   
+(l_person_info_date2 = l_person_info_date2)
+)
+rule_value = l_person_info_date2
+
+RETURN rule_value"

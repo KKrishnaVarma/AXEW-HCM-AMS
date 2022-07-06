@@ -1,0 +1,37 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000036915591,"
+/* ******************************************************************
+ * Formula Name     : AXE_HR_GET_DEPT_RULE_FF
+ * Formula Type     : Extract Rule
+ * Description      : Returns the Department Name from Value Set
+ *
+ * Change History
+ * --------------
+ *
+ * Name 	                               Ver      Date         Description
+ *-----------------------------------     ------   ------------ ------------
+   Abu Thahir                             1.0	   2019-May-15  Initial Draft
+************************************************************************** */
+
+
+DEFAULT FOR DATA_ELEMENTS IS EMPTY_TEXT_TEXT
+
+INPUTS ARE DATA_ELEMENTS (TEXT_TEXT)
+
+TRACE_FLAG = 'N'
+S_CURR_DEPARTMENT = 'NO DATA'
+
+IF (DATA_ELEMENTS.EXISTS('Department')) THEN
+(
+	S_CURR_DEPARTMENT = DATA_ELEMENTS['Department']
+
+	IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' PSHR Legacy Department (Attribute4) : '||S_CURR_DEPARTMENT))
+
+	RULE_VALUE = GET_LOOKUP_MEANING('AXE_PSHR_LEGACY_DEPARTMENT',S_CURR_DEPARTMENT) 
+
+	IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' Department Description : '||RULE_VALUE ))
+
+	RETURN RULE_VALUE
+) 
+ 
+ "

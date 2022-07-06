@@ -1,0 +1,112 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000063997101,"
+/*****************************************************************************************
+Deloitte Changes Log
+******************************************************************************************
+FORMULA NAME: AXE_HCM_COMP_SALARY_MERIT_GUIDELINES_FF
+FORMULA TYPE: Compensation Default and Override
+DESCRIPTION : This formula determines the merit guidelines for Annual Salary Review Plan                                        
+Name             Date                  Comments
+------------------------------------------------------------------------------------------
+Tanvi Khadse     11-May-2020           Initial Version
+Rajni Bhardwaj   25-Nov-2021		   Removed FTE Reference
+******************************************************************************************/
+
+inputs are CMP_IV_PLAN_ID (number), CMP_IV_ITEM_NAME (text)
+
+default for CMP_IV_ITEM_NAME is 'XX'
+default for CMP_IV_PLAN_ID is 0
+default for PER_ASG_LEGISLATION_CODE is 'XX'
+default for CMP_ASSIGNMENT_SALARY_BASIS_CODE is 'XX'
+default for CMP_ASSIGNMENT_SALARY_BASIS_NAME is 'XX'
+default for PER_ASG_JOB_CODE is 'XX'
+default for CMP_ASSIGNMENT_SALARY_AMOUNT is 0
+default for CMP_ASSIGNMENT_SALARY_ANNUALIZATION_FACTOR is 0
+default for PER_ASG_FTE_VALUE is 1
+default for PER_ASG_LOC_ATTRIBUTE1 is '1'
+/*default for PER_ASG_NORMAL_HOURS is 0*/
+
+l_eff_date = GET_CONTEXT(EFFECTIVE_DATE,to_date('4712/12/31 00:00:00'))
+l_country = PER_ASG_LEGISLATION_CODE
+l_sal_basis = upper(rtrim(replace(replace(CMP_ASSIGNMENT_SALARY_BASIS_NAME,' (','_'),' ','_'),')'))
+l_job_code = PER_ASG_JOB_CODE
+l_base_sal = CMP_ASSIGNMENT_SALARY_AMOUNT
+l_ann_factor = CMP_ASSIGNMENT_SALARY_ANNUALIZATION_FACTOR
+l_fte = PER_ASG_FTE_VALUE
+l_sal_median_udt = '0'
+l_salary_median = 0
+l_compa_ratio = 0
+l_compa_ratio_class = '_LOW'
+l_us_ldg_id = 0
+l_salary = 0
+/*l_normal_hrs = PER_ASG_NORMAL_HOURS*/
+l_merit_value = 'XX'
+l_item_display_name = 'XX'
+l_item_compa_ratio = 'XX'
+l_default_value = ' '
+
+if (CMP_ASSIGNMENT_SALARY_BASIS_CODE = 'HOURLY') then
+(
+ l_salary = l_base_sal*2080
+)
+ ELSE /*IF (CMP_ASSIGNMENT_SALARY_BASIS_CODE = 'ANNUAL' OR CMP_ASSIGNMENT_SALARY_BASIS_CODE = 'MONTHLY') then*/
+(
+ l_salary = l_base_sal*l_ann_factor
+)
+
+l_us_ldg_id = to_number(GET_VALUE_SET('AXE_HCM_COMP_LDG_ID_VS'))
+CHANGE_CONTEXTS(LEGISLATIVE_DATA_GROUP_ID = l_us_ldg_id)
+(
+ l_sal_median_udt = GET_TABLE_VALUE('AXE_HCM_COMP_SALARY_MEDIAN_UDT', l_sal_basis, l_job_code, '0')
+)
+
+l_loc_sal_med_factor = to_number(PER_ASG_LOC_ATTRIBUTE1)
+
+l_salary_median = to_number(l_sal_median_udt)*l_loc_sal_med_factor
+ 
+if (l_salary_median <> 0) then
+(
+ l_compa_ratio = (l_salary/l_salary_median)*100
+
+ if (l_compa_ratio < 90) then
+ (
+  l_compa_ratio_class = '_LOW'
+ )
+ else if (l_compa_ratio >= 90 AND l_compa_ratio <= 110) then
+ (
+  l_compa_ratio_class = '_MID'
+ )
+ else if (l_compa_ratio > 110) then
+ (
+  l_compa_ratio_class = '_HIGH'
+ )
+)
+else
+(
+ l_compa_ratio_class = '_MID'
+)
+
+l_item_display_name = GET_VALUE_SET('AXE_HCM_COMP_COLUMN_DISPLAY_NAME_VS','|=P_PLAN_ID='''||to_char(CMP_IV_PLAN_ID)||''''||
+									 '|P_ITEM_NAME='''||CMP_IV_ITEM_NAME||'''')
+									 
+if isnull(l_item_display_name) = 'Y' then
+(
+ l_item_compa_ratio = upper(replace(l_item_display_name,' ','_'))||l_compa_ratio_class
+)								 
+
+CHANGE_CONTEXTS(LEGISLATIVE_DATA_GROUP_ID = l_us_ldg_id)
+(
+ l_merit_value = GET_TABLE_VALUE('AXE_HCM_COMP_SALARY_MERIT_GUIDELINES_UDT',l_item_compa_ratio,l_country,'XX')
+)
+ 
+if (l_merit_value <> 'XX') then
+(
+ l_default_value = l_merit_value 
+ return l_default_value
+)
+else 
+(
+ return
+)
+
+"

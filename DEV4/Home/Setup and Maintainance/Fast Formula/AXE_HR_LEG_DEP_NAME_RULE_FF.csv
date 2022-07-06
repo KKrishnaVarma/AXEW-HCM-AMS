@@ -1,0 +1,38 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000036915658,"
+/* ******************************************************************
+ * Formula Name     : AXE_HR_LEG_DEP_NAME_RULE_FF
+ * Formula Type     : Extract Rule
+ * Description      : Returns the Legacy Department Name .
+ *
+ * Change History
+ * --------------
+ *
+ * Name 	                          Ver      Date          Description
+ *-----------------------------------     ------   ------------ ------------
+   Srinivas Thurakapalli              1.0	   2019-Oct-15  Initial Draft
+************************************************************************** */
+
+
+DEFAULT FOR DATA_ELEMENTS IS EMPTY_TEXT_TEXT
+
+INPUTS ARE DATA_ELEMENTS (TEXT_TEXT)
+
+TRACE_FLAG = 'N'
+RULE_VALUE = ' '
+L_DEPT_CODE ='X'
+
+IF DATA_ELEMENTS.EXISTS('Legacy_Department') THEN
+(
+L_DEPT_CODE = DATA_ELEMENTS['Legacy_Department']
+
+
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE('Legacy Department Code: '||L_DEPT_CODE))
+
+RULE_VALUE = GET_LOOKUP_MEANING('AXE_PSHR_LEGACY_DEPARTMENT',L_DEPT_CODE)
+           
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' Legacy Dept Name: '||RULE_VALUE ))
+)
+
+
+RETURN RULE_VALUE"

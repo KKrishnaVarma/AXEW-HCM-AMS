@@ -1,0 +1,25 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000171806290,"
+/***************************************************************************************************
+Formula Name: WCC_HR_MANAGER_HRCHY_BUSINESS_LEADER_NAME_FF
+Formula Type: Extract Rule
+Description : Fast Formula to fetch Employee Business Leader from Manager Hierarchy
+Org/Developer                         Date         		Comments
+----------------------------------------------------------------------------------------------------
+Deloitte/Karthikeya Andey	       	3/30/2021   		Initial version
+***************************************************************************************************/
+l_business_leader	 	= ' '
+l_person_id         	= GET_CONTEXT(PERSON_ID,1)
+l_person_id_ch      	= TO_CHAR(l_person_id)
+l_effective_date 		= TRUNC(GET_CONTEXT(EFFECTIVE_DATE, '0001/01/01 00:00:00'(date)))
+l_effective_date_ch		= TO_CHAR(l_effective_date)
+
+l_business_leader 		= GET_VALUE_SET('WCC_HR_MANAGER_HRCHY_BUSINESS_LEADER_NAME_VS', '|=PER_ID='
+								||l_person_id_ch
+								||'|EFF_DATE='
+								||l_effective_date_ch
+								||'|')
+
+rule_value = TRIM(l_business_leader)				
+
+RETURN rule_value"

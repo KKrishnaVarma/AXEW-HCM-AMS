@@ -1,0 +1,49 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000036915666,"
+/* ******************************************************************
+ * Formula Name     : AXE_HR_PERSON_OTHER_PH_NO_RULE_FF
+ * Formula Type     : Extract Rule
+ * Description      : Returns Person Other Phone Number .
+ *
+ * Change History
+ * --------------
+ *
+ * Name 	                          Ver      Date          Description
+ *-----------------------------------     ------   ------------ ------------
+  Srinivas Thurakapalli               1.0	   2019-Sep-22  Initial Draft
+************************************************************************** */
+
+
+DEFAULT FOR DATA_ELEMENTS IS EMPTY_TEXT_TEXT
+
+INPUTS ARE DATA_ELEMENTS (TEXT_TEXT)
+
+TRACE_FLAG = 'Y'
+RULE_VALUE = ' '
+L_DATE = ' '
+L_DATE1= ' '
+
+l_effective_date='1900-01-01T00:00:00.000Z' (DATE) 
+
+IF DATA_ELEMENTS.EXISTS('Person_ID') THEN
+(
+S_PERSON_ID = DATA_ELEMENTS['Person_ID']
+)
+
+IF DATA_ELEMENTS.EXISTS('EffectiveDate') THEN
+(
+L_DATE=DATA_ELEMENTS['EffectiveDate']
+L_DATE1=SUBSTR(L_DATE,1,10)
+
+)
+
+
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE('S_PERSON_ID : '||S_PERSON_ID||':Effectrive Date : '||L_DATE1))
+
+RULE_VALUE = GET_VALUE_SET('AXE_PERSON_OTHER_PHONE_VS','|=PERSON_ID='''||S_PERSON_ID||''''||'|EFFECTIVE_DATE='''||L_DATE1||'''') 
+           
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' Person Other Phone Number: '||RULE_VALUE ))
+
+
+RETURN RULE_VALUE
+"

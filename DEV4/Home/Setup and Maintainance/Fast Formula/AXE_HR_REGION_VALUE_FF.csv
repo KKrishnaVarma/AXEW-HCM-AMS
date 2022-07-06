@@ -1,0 +1,33 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000094084378,"
+/* ******************************************************************
+ * Formula Name     : AXE_HR_REGION_VALUE_FF
+ * Formula Type     : Extract Rule
+ * Description      : Returns Assignment REGION Value
+ *
+ * Change History
+ * --------------
+ *
+ * Name 	                          Ver      Date              Description
+ *-----------------------------------     ------   ------------ ------------
+   Manish                            1.0	   2021-April-26    Initial Draft
+************************************************************************** */
+
+
+DEFAULT FOR DATA_ELEMENTS IS EMPTY_TEXT_TEXT
+
+INPUTS ARE DATA_ELEMENTS (TEXT_TEXT)
+
+TRACE_FLAG = 'Y'
+RULE_VALUE = ' '
+
+
+IF DATA_ELEMENTS.EXISTS('ASS_ATTRIBUTE6') THEN
+(
+L_ATTRIBUTE6_CODE = DATA_ELEMENTS['ASS_ATTRIBUTE6']
+
+RULE_VALUE = HR_GET_TABLE_VALUE('AXEW_HCM_WESCO_COA_MATRIX_UDT','AXEW_REGION_ID',L_ATTRIBUTE6_CODE)           
+IF TRACE_FLAG = 'N' THEN (RET = ESS_LOG_WRITE('GROUP ID Value : '||RULE_VALUE ))
+)
+
+RETURN RULE_VALUE"

@@ -1,0 +1,60 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000036915657,"
+/* ******************************************************************
+ * Formula Name     : AXE_HR_DATE_FORMAT_RULE_FF
+ * Formula Type     : Extract Rule
+ * Description      : Returns Formatted Date for UK Backfeed.
+ *
+ * Change History
+ * --------------
+ *
+ * Name 	                          Ver      Date          Description
+ *-----------------------------------     ------   ------------ ------------
+   Srinivas Thurakapalli              1.0	   2019-Nov-07  Initial Draft
+************************************************************************** */
+
+
+DEFAULT FOR DATA_ELEMENTS IS EMPTY_TEXT_TEXT
+
+INPUTS ARE DATA_ELEMENTS (TEXT_TEXT)
+
+TRACE_FLAG = 'N'
+RULE_VALUE = ' '
+S_EL_ENTRY_START_DT = '1901/01/01 00:00:00' (date)
+S_EL_ENTRY_END_DT = '1901/01/01 00:00:00' (date)
+S_RUN_DT = '1901/01/01 00:00:00' (date)
+L_EL_ENTRY_START_DT = ' '
+L_EL_ENTRY_END_DT = ' '
+L_RUN_DT = ' '
+IF(DATA_ELEMENTS.EXISTS('Element_Entry_Start_Date')) THEN
+(	S_EL_ENTRY_START_DT = TO_DATE(SUBSTR(DATA_ELEMENTS['Element_Entry_Start_Date'],1,10),'YYYY/MM/DD')
+    L_EL_ENTRY_START_DT = TO_CHAR(S_EL_ENTRY_START_DT,'YYYY/MM/DD')
+	
+)                            
+
+
+IF(DATA_ELEMENTS.EXISTS('Element_Entry_End_Date')) THEN
+(	S_EL_ENTRY_END_DT = TO_DATE(SUBSTR(DATA_ELEMENTS['Element_Entry_End_Date'],1,10),'YYYY/MM/DD')
+    L_EL_ENTRY_END_DT = TO_CHAR(S_EL_ENTRY_END_DT,'YYYY/MM/DD')
+
+)                            
+
+
+IF(DATA_ELEMENTS.EXISTS('Process_Run_Date')) THEN
+(	S_RUN_DT = TO_DATE(SUBSTR(DATA_ELEMENTS['Process_Run_Date'],1,10),'YYYY/MM/DD')
+    L_RUN_DT = TO_CHAR(S_RUN_DT,'YYYY/MM/DD')
+)                            
+
+
+
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE('L_EL_ENTRY_START_DT : '||L_EL_ENTRY_START_DT||'L_EL_ENTRY_END_DT:'||L_EL_ENTRY_END_DT||'L_RUN_DT:'||L_RUN_DT))
+
+
+
+RULE_VALUE = L_EL_ENTRY_START_DT||L_EL_ENTRY_END_DT||L_RUN_DT
+           
+
+
+
+RETURN RULE_VALUE
+"

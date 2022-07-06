@@ -1,0 +1,52 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000036915648,"
+/* ******************************************************************
+ * Formula Name     : AXE_HR_MANAGER_LOCATION_RULE_FF
+ * Rice ID          : HCM_I022 - AXE RC Create User Interface
+ * Formula Type     : Extract Rule
+ * Description      : Returns the current Location for Manager
+ *
+ * Change History
+ * --------------
+ *
+ * Name 	                               Ver      Date         Description
+ *-----------------------------------     ------   ------------ ------------
+   Abu Thahir                             1.0	   2019-AUG-30  Initial Draft
+************************************************************************** */
+DEFAULT FOR DATA_ELEMENTS IS EMPTY_TEXT_TEXT
+DEFAULT FOR PER_ASG_LOCATION_NAME IS 'NO DATA'
+
+INPUTS ARE DATA_ELEMENTS (TEXT_TEXT)
+
+TRACE_FLAG = 'N'
+L_ASG_ID = 0
+E_ASG_ID= ' '
+L_ASG_LOCATION_NAME = 'NO DATA'
+
+
+IF (DATA_ELEMENTS.EXISTS('HR_Assignment_ID')) THEN
+(
+E_ASG_ID = DATA_ELEMENTS['HR_Assignment_ID']
+L_ASG_ID = TO_NUMBER(E_ASG_ID)
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' Person ID is '||E_ASG_ID ))
+
+CHANGE_CONTEXTS(HR_ASSIGNMENT_ID = L_ASG_ID)
+(
+L_ASG_LOCATION_NAME = PER_ASG_LOCATION_NAME
+)
+
+)
+
+
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' is '|| L_ASG_LOCATION_NAME))
+
+IF L_ASG_LOCATION_NAME = 'NO DATA' THEN
+              (
+              RULE_VALUE = ' '
+              )
+ELSE
+              (
+              RULE_VALUE = L_ASG_LOCATION_NAME
+              )
+
+RETURN RULE_VALUE"

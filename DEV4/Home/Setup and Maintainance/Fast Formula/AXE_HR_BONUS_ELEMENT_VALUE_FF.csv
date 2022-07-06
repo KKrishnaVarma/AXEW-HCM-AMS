@@ -1,0 +1,29 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000094084370,"
+/* ******************************************************************************
+FORMULA NAME: AXE_HR_BONUS_ELEMENT_VALUE_FF
+FORMULA TYPE: Extract Rule
+DESCRIPTION : This Formula is used get Bonus Element Entry Value
+Change History:
+Name                 Date                      Comments
+--------------------------------------------------------------------------------
+Manish              30-April-2021            Initial Version
+******************************************************************************/ 
+DEFAULT FOR DATA_ELEMENTS   IS EMPTY_TEXT_TEXT
+DEFAULT FOR L_VALUE         is '0'
+DEFAULT FOR RULE_VALUE      is ' '
+
+INPUTS ARE DATA_ELEMENTS (TEXT_TEXT)
+L_EFFECTIVE_DATE =  get_context(effective_date, '0001/01/01 00:00:00'(date))
+DATE_ASSIGNED =  '1901/01/01 00:00:00' (date)
+RULE_VALUE= ' '
+
+IF DATA_ELEMENTS.EXISTS('Person_Id') THEN
+(             
+   l_person_id = DATA_ELEMENTS['Person_Id']
+   DATE_ASSIGNED = L_EFFECTIVE_DATE   
+   RULE_VALUE = GET_VALUE_SET('AXE_HR_BONUS_ELEMENT_VS','|=Person_id='''||L_Person_id||''''||'|Effective_date='||to_char(DATE_ASSIGNED,'YYYY-MM-DD')||'''')
+    
+)
+RETURN RULE_VALUE
+"

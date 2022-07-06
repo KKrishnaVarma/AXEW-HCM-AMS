@@ -1,0 +1,37 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000036915590,"
+/* ******************************************************************
+ * Formula Name     : AXE_HR_GET_LOB_RULE_FF
+ * Formula Type     : Extract Rule
+ * Description      : Returns the LOB from UDT
+ *
+ * Change History
+ * --------------
+ *
+ * Name 	                               Ver      Date         Description
+ *-----------------------------------     ------   ------------ ------------
+   Abu Thahir                             1.0	   2019-May-15  Initial Draft
+************************************************************************** */
+
+
+DEFAULT FOR DATA_ELEMENTS IS EMPTY_TEXT_TEXT
+
+INPUTS ARE DATA_ELEMENTS (TEXT_TEXT)
+
+TRACE_FLAG = 'N'
+S_CURR_DEPT_ID = 'NODATA'
+
+
+IF (DATA_ELEMENTS.EXISTS('PSHR_PL_Location')) THEN
+(
+
+S_CURR_DEPT_ID = DATA_ELEMENTS['PSHR_PL_Location']
+
+	IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE('PSHR Legacy P&L Location(Attribute3) : '||S_CURR_DEPT_ID ))
+
+	RULE_VALUE = GET_TABLE_VALUE('AXE_HCM_PL_LOCATION_MATRIX_UDT','PS_POWER_SOLUTION_LOB_NAME',S_CURR_DEPT_ID,'Missing BU Mapping') 
+
+	IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' UDT - PS_PL_LOCATION_NAME : '||RULE_VALUE ))
+
+RETURN RULE_VALUE
+)"

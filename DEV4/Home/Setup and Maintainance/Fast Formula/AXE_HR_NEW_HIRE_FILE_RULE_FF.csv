@@ -1,0 +1,68 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000036915653,"
+/* ******************************************************************
+ * Formula Name     : AXE_HR_NEW_HIRE_FILE_RULE_FF
+ * Formula Type     : Extract Rule
+ * Description      : Returns New Hire Output File Name.
+ *
+ * Change History
+ * --------------
+ *
+ * Name 	                          Ver      Date          Description
+ *-----------------------------------     ------   ------------ ------------
+   Srinivas Thurakapalli              1.0	   2019-Sep-19  Initial Draft
+************************************************************************** */
+
+
+DEFAULT FOR DATA_ELEMENTS IS EMPTY_TEXT_TEXT
+
+INPUTS ARE DATA_ELEMENTS (TEXT_TEXT)
+
+TRACE_FLAG = 'N'
+RULE_VALUE = 'X'
+L_FLOW_ID = 'X'
+L_PAYROLL_NAME ='X'
+S_PAYROLL_NAME ='X'
+L_FLOW_NAME = 'X'
+L_FILE_NAME = 'CloudPayPDPensionNewJoiners'
+
+
+L_COMPANY_ID=GET_PARAMETER_VALUE('COMPANY_ID')
+
+S_PAYROLL_NAME=GET_PARAMETER_VALUE('PAYROLL_RUN_ID')
+
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE('L_FLOW_ID : '||L_FLOW_ID||'L_COMPANY_ID:'||L_COMPANY_ID||'S_PAYROLL_NAME:'||S_PAYROLL_NAME))
+
+IF S_PAYROLL_NAME <> 'X' THEN
+(
+L_PAYROLL_NAME = REPLACE(S_PAYROLL_NAME,' ','_')
+)
+
+
+
+IF(DATA_ELEMENTS.EXISTS('Flow_Instance_Name')) THEN
+(	L_FLOW_ID=DATA_ELEMENTS['Flow_Instance_Name']
+)
+
+
+IF L_FLOW_ID <>'X' THEN
+(
+
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE('Pyroll Process Flow ID : '||L_FLOW_ID))
+
+
+
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE('Pyroll Process Flow Name : '||L_FLOW_ID))
+
+
+RULE_VALUE = L_PAYROLL_NAME||'-'||L_COMPANY_ID||'-'||L_FILE_NAME||'-'||L_FLOW_ID
+           
+
+
+
+
+
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' OutPut File Name : '||RULE_VALUE ))
+)
+
+RETURN RULE_VALUE"

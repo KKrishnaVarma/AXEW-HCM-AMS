@@ -1,0 +1,29 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000063997107,"
+/*****************************************************************
+FORMULA NAME: AXE_HCM_COMP_SALARY_CHANGE_ACTION_FF 
+FORMULA TYPE: Compensation Default and Override
+DESCRIPTION : Fast Formula to returns Most recent Salary Change Action
+LEGISLATIVE DATA GROUP: <blank>
+
+Name           Date       Description
+-------------------------------------------------------------------
+PRANAV GUPTA  13-MAY-2020  Initial Version
+
+*****************************************************************/
+
+DEFAULT for CMP_ASSIGNMENT_SALARY_ACTION_NAME is ' '
+DEFAULT for CMP_ASSIGNMENT_SALARY_ACTION_REASON_NAME is ' '
+
+DEFAULT FOR CMP_ASSIGNMENT_SALARY_ACTION_NAME IS 'NULL'
+
+L_DEFAULT_VALUE = ' '
+L_DATA_TYPE = 'CHAR'
+
+
+IF CMP_ASSIGNMENT_SALARY_ACTION_NAME WAS NOT DEFAULTED THEN
+      (
+       L_DEFAULT_VALUE = CMP_ASSIGNMENT_SALARY_ACTION_NAME
+       )
+      
+RETURN L_DATA_TYPE, L_DEFAULT_VALUE "

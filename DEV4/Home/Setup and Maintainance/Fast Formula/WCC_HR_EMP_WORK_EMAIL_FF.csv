@@ -1,0 +1,34 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000186303879,"
+/***************************************************************************************************
+Formula Name: WCC_HR_EMP_WORK_EMAIL_FF
+Formula Type: Extract Rule
+Description : Fetches Employee Work Email Address
+Org/Developer                         Date         		Comments
+----------------------------------------------------------------------------------------------------
+Deloitte/Karthikeya Andey	       	9/28/2021   	Initial version
+***************************************************************************************************/
+DEFAULT_DATA_VALUE FOR PER_EXT_EMAIL_EMAIL_TYPE IS ' ' 
+DEFAULT_DATA_VALUE FOR PER_EXT_EMAIL_EMAIL_ADDRESS IS ' '
+DEFAULT_DATA_VALUE FOR PER_EXT_EMAIL_EMAIL_ADDRESS_ID IS -1
+DEFAULT_DATA_VALUE FOR PER_EXT_EMAIL_DATE_FROM IS '0001/01/01 00:00:00' (date)
+DEFAULT_DATA_VALUE FOR PER_EXT_EMAIL_DATE_TO IS '0001/01/01 00:00:00' (date)
+
+l_email				= ' '
+
+l_arr_index = PER_EXT_EMAIL_EMAIL_TYPE.FIRST(-1)
+WHILE PER_EXT_EMAIL_EMAIL_TYPE.EXISTS(l_arr_index)
+LOOP 
+(
+	IF PER_EXT_EMAIL_EMAIL_TYPE[l_arr_index] = 'W1' 
+	THEN
+	(
+		l_email = PER_EXT_EMAIL_EMAIL_ADDRESS[l_arr_index]
+	)			
+	l_arr_index = PER_EXT_EMAIL_EMAIL_TYPE.NEXT(l_arr_index, -1)
+)
+
+
+RULE_VALUE = TRIM(l_email)
+
+RETURN RULE_VALUE"

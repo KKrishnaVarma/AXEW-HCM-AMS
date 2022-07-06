@@ -1,0 +1,46 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000176624500,"
+/***************************************************************************************************
+Formula Name: WCC_HR_WESCO_LEGACY_EMP_NO_FF
+Formula Type: Extract Rule
+Description : Fast Formula to fetch Wesco Legacy Employee Number
+Extract Name: 
+Org/Developer                         Date         		Comments
+----------------------------------------------------------------------------------------------------
+Deloitte/Karthikeya Andey	       	8/31/2021   		Initial version
+***************************************************************************************************/
+DEFAULT FOR PER_PER_PERSON_NUMBER IS ' '
+DEFAULT_DATA_VALUE FOR PER_EXT_APP_IDENTIFIERS_DATE_FROM IS '0001/01/01 00:00:00' (date)
+DEFAULT_DATA_VALUE FOR PER_EXT_APP_IDENTIFIERS_DATE_TO IS '4712/12/31 00:00:00' (date)
+DEFAULT_DATA_VALUE FOR PER_EXT_APP_IDENTIFIERS_EXT_IDENTIFIER_NUMBER IS '0'
+DEFAULT_DATA_VALUE FOR PER_EXT_APP_IDENTIFIERS_EXT_IDENTIFIER_SEQ IS -1
+DEFAULT_DATA_VALUE FOR PER_EXT_APP_IDENTIFIERS_EXT_IDENTIFIER_TYPE IS ' '
+DEFAULT_DATA_VALUE FOR PER_EXT_APP_IDENTIFIERS_PERSON_ID IS -1
+
+l_person_id		= GET_CONTEXT(PERSON_ID,1)
+l_effective_date	= TRUNC(GET_CONTEXT(EFFECTIVE_DATE, '0001/01/01 00:00:00'(date)))
+
+l_value			= ' '
+l_ext_identifier	= '0'
+l_person_number		= PER_PER_PERSON_NUMBER
+
+l_arr_index = PER_EXT_APP_IDENTIFIERS_EXT_IDENTIFIER_NUMBER.FIRST(-1)
+WHILE PER_EXT_APP_IDENTIFIERS_EXT_IDENTIFIER_NUMBER.EXISTS(l_arr_index) LOOP
+(	
+	IF TO_CHAR(l_effective_date, 'YYYY-MM-DD') >= TO_CHAR(PER_EXT_APP_IDENTIFIERS_DATE_FROM[l_arr_index], 'YYYY-MM-DD')
+	AND TO_CHAR(l_effective_date, 'YYYY-MM-DD') <= TO_CHAR(PER_EXT_APP_IDENTIFIERS_DATE_TO[l_arr_index], 'YYYY-MM-DD')
+	AND (PER_EXT_APP_IDENTIFIERS_EXT_IDENTIFIER_TYPE[l_arr_index] =  'AXEW_LEGACY_WESCO_ID') 
+	THEN
+	(
+	    l_ext_identifier = PER_EXT_APP_IDENTIFIERS_EXT_IDENTIFIER_NUMBER[l_arr_index]
+	)
+	l_arr_index = PER_EXT_APP_IDENTIFIERS_EXT_IDENTIFIER_NUMBER.NEXT(l_arr_index, -1)
+)
+
+IF l_ext_identifier = '0' 
+THEN l_value = l_person_number
+ELSE l_value = l_ext_identifier
+
+rule_value = TRIM(l_value)				
+
+RETURN rule_value"

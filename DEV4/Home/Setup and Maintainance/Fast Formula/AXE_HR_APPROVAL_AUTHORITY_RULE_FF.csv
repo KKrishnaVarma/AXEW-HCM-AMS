@@ -1,0 +1,50 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000036915630,"
+/* ******************************************************************
+ * Formula Name     : AXE_HR_APPROVAL_AUTHORITY_RULE_FF
+ * Rice ID          : HCM_I026 - CONCUR Interface
+ * Formula Type     : Extract Rule
+ * Description      : Get the Level of an Job  for an employee  
+ *
+ * Change History
+ * --------------
+ *
+ * Name 	                               Ver      Date         Description
+ *-----------------------------------     ------   ------------ ------------
+   Abu Thahir                             1.0	   2019-Sep-19  Initial Draft
+***************************************************************************** */
+
+
+
+DEFAULT FOR DATA_ELEMENTS IS EMPTY_TEXT_TEXT
+DEFAULT FOR PER_JOB_APPROVAL_AUTHORITY IS 0 
+
+INPUTS ARE DATA_ELEMENTS (TEXT_TEXT)
+
+TRACE_FLAG = 'Y'
+L_JOB_ID = 0
+L_EFF_DATE = GET_CONTEXT(EFFECTIVE_DATE, TO_DATE('1951/01/01'))
+
+IF DATA_ELEMENTS.exists('Job_ID') THEN 
+(
+E_JOB_ID = DATA_ELEMENTS['Job_ID']
+L_JOB_ID = TO_NUMBER(E_JOB_ID)
+
+
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' AXE_HR_APPROVAL_AUTHORITY_RULE_FF - Starts' ))
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' Person ID is '||E_JOB_ID ||' Job ID '||E_JOB_ID))
+
+CHANGE_CONTEXTS(EFFECTIVE_DATE=L_EFF_DATE,JOB_ID=L_JOB_ID)
+(
+APROV_AUTH = PER_JOB_APPROVAL_AUTHORITY
+)
+
+)
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' Primary Phone Type '|| TO_CHAR(APROV_AUTH) ))
+
+RULE_VALUE = TO_CHAR(APROV_AUTH)
+
+RETURN RULE_VALUE  
+
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' AXE_HR_APPROVAL_AUTHORITY_RULE_FF - Ends' ))
+"

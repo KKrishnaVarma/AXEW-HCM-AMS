@@ -1,0 +1,53 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000063997104,"
+/*****************************************************************
+FORMULA NAME: AXE_HCM_COMP_SALARY_BONUS_TARGET_COMPONENT_ELIGIBILITY_FF 
+FORMULA TYPE: Participation and Rate Eligibility
+DESCRIPTION : Fast Formula to determine the eligibility for Bonus Target Component for Annual Salary review plan 
+LEGISLATIVE DATA GROUP: <blank>
+
+Name           Date       Description
+-------------------------------------------------------------------
+Rishi Tiwari  12-MAY-2020  Initial Version
+
+*****************************************************************/
+
+DEFAULT FOR CMP_IV_PLAN_START_DATE IS '1951/01/01' (Date)
+DEFAULT FOR L_PLAN_START_DATE IS '1951/01/01' (Date)
+DEFAULT FOR PER_JOB_FAMILY_NAME IS 'NULL'
+DEFAULT FOR CMP_ASSIGNMENT_SALARY_BASIS_NAME IS 'NULL'
+INPUTS ARE CMP_IV_PLAN_START_DATE (Date)
+
+ELIGIBLE = 'N'
+
+
+IF CMP_IV_PLAN_START_DATE WAS NOT DEFAULTED THEN
+   L_PLAN_START_DATE = CMP_IV_PLAN_START_DATE
+ELSE
+   L_PLAN_START_DATE = get_context(EFFECTIVE_DATE, '2020/01/01 00:00:00' (date))
+
+/*Exclude based on hire cut-off date */ 
+IF PER_JOB_FAMILY_NAME WAS NOT DEFAULTED AND CMP_ASSIGNMENT_SALARY_BASIS_NAME WAS NOT DEFAULTED Then
+(
+
+ /*Exclude based on Assignment status*/
+  IF PER_JOB_FAMILY_NAME = 'Sales and Customer Support' Then
+  (
+     ELIGIBLE = 'N'
+  )  
+  ELSE IF PER_JOB_FAMILY_NAME = 'Operations' 
+       AND CMP_ASSIGNMENT_SALARY_BASIS_NAME = 'US Hourly Salary Basis' Then
+  ( 
+    ELIGIBLE = 'N'
+  )
+ ELSE
+  ( 
+    ELIGIBLE = 'Y'
+  )
+)
+ELSE
+(
+  ELIGIBLE='Y'
+)
+
+RETURN ELIGIBLE"

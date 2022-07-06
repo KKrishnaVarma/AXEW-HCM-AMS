@@ -1,0 +1,43 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000171806305,"
+/***************************************************************************************************
+Formula Name: WCC_HR_SUNLIFE_TERMINATION_DETAILS_FF
+Formula Type: Extract Rule
+Description : Fetches Termination Details
+Org/Developer                         Date         		Comments
+----------------------------------------------------------------------------------------------------
+Deloitte/Karthikeya Andey	       	4/26/2021   	Initial version
+***************************************************************************************************/
+DEFAULT FOR PER_ASG_REL_ACTUAL_TERMINATION_DATE IS '0001/01/01 00:00:00'(date)
+DEFAULT FOR PER_EMP_TERMINATION_ACTION_CODE IS ' '
+DEFAULT FOR PER_EMP_TERMINATION_ACTION_NAME IS ' '
+DEFAULT FOR PER_EMP_TERMINATION_REASON_CODE IS ' '
+DEFAULT FOR PER_EMP_TERMINATION_REASON IS ' '
+
+l_rule_value			= ' '
+l_effective_date 		= TRUNC(GET_CONTEXT(EFFECTIVE_DATE, '0001/01/01 00:00:00'(date)))
+
+IF PER_ASG_REL_ACTUAL_TERMINATION_DATE WAS NOT DEFAULTED
+THEN 
+(
+	l_termination_date	= PER_ASG_REL_ACTUAL_TERMINATION_DATE
+			
+	IF PER_EMP_TERMINATION_REASON_CODE WAS NOT DEFAULTED
+	THEN 
+	(
+		l_term_reason_code  = PER_EMP_TERMINATION_REASON_CODE
+	)ELSE(
+		l_term_reason_code  = PER_EMP_TERMINATION_ACTION_CODE
+	)
+	
+	IF TO_CHAR(l_termination_date, 'YYYY/MM/DD') < TO_CHAR(l_effective_date, 'YYYY/MM/DD')
+	THEN
+	(
+		l_rule_value = TRIM(l_term_reason_code)||'|'||TRIM(l_term_reason_code)||'^'||TO_CHAR(l_termination_date)
+	)
+	
+)
+
+rule_value = TRIM(l_rule_value)
+
+RETURN rule_value"

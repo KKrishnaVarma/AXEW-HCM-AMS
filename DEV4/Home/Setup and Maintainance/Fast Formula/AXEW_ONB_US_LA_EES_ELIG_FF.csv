@@ -1,0 +1,67 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000159808215,"
+/*************************************************************************************
+Formula Name:  AXEW_ONB_US_LA_EES_ELIG_FF
+FORMULA TYPE:  Participation And Rate Eligibility
+DESCRIPTION:   Returns Y if candidate Country is US and State of Work Location is Louisiana and direct or indirect reportee of Nelson Squires 
+Org/Developer                         Date         		Comments
+----------------------------------------------------------------------------------------------------
+Deloitte/Karthikeya Andey	    6/22/2021   	Initial version
+***************************************************************************************************/
+
+/*** Default : Database Items ***/
+DEFAULT FOR PER_ASG_ASSIGNMENT_ID IS 0
+DEFAULT FOR PER_ASG_LOC_COUNTRY IS ' '
+DEFAULT FOR PER_ASG_LOC_REGION2 IS ' '
+DEFAULT FOR PER_ASG_WORK_AT_HOME IS ' '
+DEFAULT FOR PER_ASG_PRIMARY_ADDRESS_TYPE IS ' '
+DEFAULT FOR PER_PER_PERSON_ADD_USAGE_COUNTRY IS ' '
+DEFAULT FOR PER_PER_PERSON_ADD_USAGE_REGION2 IS ' '
+
+/*** Local Variable Declaration ***/
+ELIGIBLE		= 'N'
+l_manager_no	        = '66542'
+l_asg_id		= PER_ASG_ASSIGNMENT_ID
+l_effective_date        = TRUNC(GET_CONTEXT(EFFECTIVE_DATE, '0001/01/01 00:00:00'(date)))
+l_country		= ' '
+l_state			= ' '
+l_value			= ' '
+
+
+IF PER_ASG_WORK_AT_HOME WAS NOT DEFAULTED AND PER_ASG_WORK_AT_HOME = 'Y' THEN
+(
+	IF PER_ASG_PRIMARY_ADDRESS_TYPE WAS NOT DEFAULTED THEN
+	(
+		CHANGE_CONTEXTS(ADDRESS_TYPE = PER_ASG_PRIMARY_ADDRESS_TYPE)
+		(
+			l_country	= PER_PER_PERSON_ADD_USAGE_COUNTRY
+			l_state		= PER_PER_PERSON_ADD_USAGE_REGION2
+		)
+	)
+)ELSE(
+	IF PER_ASG_LOC_COUNTRY WAS NOT DEFAULTED AND PER_ASG_LOC_REGION2 WAS NOT DEFAULTED THEN 
+	(
+		l_country	= PER_ASG_LOC_COUNTRY
+		l_state		= PER_ASG_LOC_REGION2
+	)
+)
+
+
+IF l_country = 'US' AND l_state = 'LA' THEN 
+(
+	l_value = GET_VALUE_SET('AXEW_ONB_CHECKLIST_MANAGER_HRCHY_VS', '|=ASG_ID='
+							||TO_CHAR(l_asg_id)
+							||'|MANAGER_NUMBER='
+							||l_manager_no
+							||'|EFF_DATE='
+							||TO_CHAR(l_effective_date)
+							||'|')
+
+	l_employee	= SUBSTR(l_value, 1, INSTR(l_value, '|', 1, 1) - 1)
+	l_supervisor	= SUBSTR(l_value, INSTR(l_value, '|', 1, 1) + 1 , LENGTH(l_value) - INSTR(l_value, '|', 1, 1))
+	
+	IF l_manager_no = l_supervisor OR l_manager_no = l_employee
+	THEN ELIGIBLE = 'Y'
+)
+
+RETURN ELIGIBLE"
