@@ -1,0 +1,36 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000171806297,"
+/***************************************************************************************************
+Formula Name: WCC_HR_COA_MATRIX_CODES_FF
+Formula Type: Extract Rule
+Description : Fetches District, Group, Region, Branch details based on Branch Id
+Org/Developer                         Date         		Comments
+----------------------------------------------------------------------------------------------------
+Deloitte/Karthikeya Andey	       	1/20/2021   	Initial version
+***************************************************************************************************/
+DEFAULT FOR PER_ASG_ATTRIBUTE6 IS ' '
+
+l_rule_value	= ' '
+l_branch_id		= ' '
+l_district_id	= ' '
+l_group_id		= ' '
+l_region_id		= ' '
+
+IF PER_ASG_ATTRIBUTE6 WAS NOT DEFAULTED 
+THEN 
+(
+	l_branch_id 	= PER_ASG_ATTRIBUTE6
+	
+	l_district_id 	= GET_TABLE_VALUE('AXEW_HCM_WESCO_COA_MATRIX_UDT', 'AXEW_DISTRICT_ID', TRIM(l_branch_id), ' ')
+	
+	l_group_id	 	= GET_TABLE_VALUE('AXEW_HCM_WESCO_COA_MATRIX_UDT', 'AXEW_GROUP_ID', TRIM(l_branch_id), ' ')
+
+	l_region_id	 	= GET_TABLE_VALUE('AXEW_HCM_WESCO_COA_MATRIX_UDT', 'AXEW_REGION_ID', TRIM(l_branch_id), ' ')
+	
+	l_rule_value	= TRIM(l_branch_id)||'^'||TRIM(l_district_id)||'^'||TRIM(l_group_id)||'^'||TRIM(l_region_id) 
+)
+
+RULE_VALUE = TRIM(l_rule_value)
+
+RETURN RULE_VALUE
+"

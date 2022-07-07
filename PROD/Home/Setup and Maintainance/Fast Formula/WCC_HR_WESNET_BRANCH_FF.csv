@@ -1,0 +1,48 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000171806287,"
+/***************************************************************************************************
+Formula Name: WCC_HR_WESNET_BRANCH_FF
+Formula Type: Extract Rule
+Description : Fetches Branch details based on Branch Code
+Org/Developer                         Date         		Comments
+----------------------------------------------------------------------------------------------------
+Deloitte/Shruti Krishnan	       	1/29/2021   	Initial version
+                                        3/3/2021        Change in Branch Code mapping
+***************************************************************************************************/
+DEFAULT FOR DATA_ELEMENTS IS EMPTY_TEXT_TEXT
+
+INPUTS ARE DATA_ELEMENTS (TEXT_TEXT)
+
+
+l_rule_value	 = ' '
+
+l_branch_id      = ' '
+l_branch_code	 = ' '
+l_branch_details = ' '
+
+
+IF(DATA_ELEMENTS.EXISTS('Branch_Id')) THEN
+(
+	l_branch_id 	 = DATA_ELEMENTS['Branch_Id']
+
+    /* l_branch_code = GET_VALUE_SET('WCC_HR_LOOKUP_DESCRIPTION_VS', '|=P_LOOKUP_TYPE='
+								||'AXEW_BRANCH_ID'
+								||'|P_LOOKUP_CODE='
+								||l_branch_id
+								||'|') 
+	
+	l_branch_details = TRIM(l_branch_id)||'-'||TRIM(l_branch_code)
+	
+	IF l_branch_details = '-' OR l_branch_details = '0-0'
+	THEN (l_branch_details = ' ')
+
+	*/
+	l_branch_code    = GET_LOOKUP_MEANING('AXEW_BRANCH_ID',l_branch_id)
+    l_branch_details = l_branch_code
+	l_rule_value = TRIM(l_branch_details)
+	
+)
+
+RULE_VALUE = TRIM(l_rule_value)
+
+RETURN RULE_VALUE"

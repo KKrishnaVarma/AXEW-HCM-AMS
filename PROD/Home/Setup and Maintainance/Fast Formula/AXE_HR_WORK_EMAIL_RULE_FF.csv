@@ -1,0 +1,48 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000036915603,"
+/* ******************************************************************
+ * Formula Name     : AXE_HR_WORK_EMAIL_RULE_FF
+ * Rice ID          : HCM_I030
+ * Formula Type     : Extract Rule
+ * Description      : To get the Work Email for the Person ID  
+ *
+ * Change History
+ * --------------
+ *
+ * Name 	                               Ver      Date         Description
+ *-----------------------------------     ------   ------------ ------------
+   Abu Thahir                             1.0	   2019-Jun-11  Initial Draft
+***************************************************************************** */
+
+
+default_data_value for PER_EXT_EMAIL_EMAIL_TYPE is 'null'
+default_data_value for PER_EXT_EMAIL_EMAIL_ADDRESS is 'null'
+DEFAULT FOR DATA_ELEMENTS IS EMPTY_TEXT_TEXT
+
+INPUTS ARE DATA_ELEMENTS      (TEXT_TEXT)
+
+TRACE_FLAG = 'N'
+L_PERSON_ID = 0
+
+
+
+if (DATA_ELEMENTS.EXISTS('Person_ID')) then
+(
+  I = 1
+E_PERSON_ID = DATA_ELEMENTS['Person_ID']
+L_PERSON_ID = TO_NUMBER(E_PERSON_ID)
+  CHANGE_CONTEXTS(PERSON_ID = L_PERSON_ID)
+  
+  WHILE PER_EXT_EMAIL_EMAIL_TYPE.EXISTS(I) LOOP
+  (
+  	IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' Inside While Loop '))
+    email_type = PER_EXT_EMAIL_EMAIL_TYPE[I]
+    rule_value = PER_EXT_EMAIL_EMAIL_ADDRESS[I]
+    if (email_type= 'W1') then
+    (
+       return rule_value
+	   EXIT
+    )
+    I = I + 1
+  )
+)"

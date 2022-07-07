@@ -1,0 +1,25 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000063997112,"
+/*****************************************************************
+FORMULA NAME: AXE_HCM_COMP_SALARY_PLAN_UNION_FF 
+FORMULA TYPE: Compensation Default and Override
+DESCRIPTION : Fast Formula to return Assignment Union 
+LEGISLATIVE DATA GROUP: <blank>
+
+Name           Date       Description
+-------------------------------------------------------------------
+Tanvi Khadse  15-MAY-2020  Initial Version
+
+*****************************************************************/
+
+default for PER_ASG_UNION_NAME is 'XXX'
+
+l_default_value = ' '
+l_data_type = 'CHAR'
+
+if PER_ASG_UNION_NAME WAS not defaulted then
+(
+ l_default_value = PER_ASG_UNION_NAME
+)
+      
+return l_data_type, l_default_value "

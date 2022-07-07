@@ -1,0 +1,33 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000063997116,"
+/*******************************************************************************************************
+Deloitte Changes Log
+********************************************************************************************************
+FORMULA NAME: AXE_HCM_COMP_SALARY_STATUTORY_ELIGIBILITY_FF
+FORMULA TYPE: Participation and Rate Eligibility
+DESCRIPTION : This formula determines the Statutory component eligibility for Annual Salary Review Plan                                        
+Name             Date                  Comments
+--------------------------------------------------------------------------------------------------------
+Tanvi Khadse     26-May-2020           Initial Version
+********************************************************************************************************/
+
+default for PER_ASG_LEGISLATION_CODE is 'XX'
+
+l_country = PER_ASG_LEGISLATION_CODE
+l_us_ldg_id = 0
+l_stat_udt = 'XX'
+ELIGIBLE = 'N'
+
+l_us_ldg_id = to_number(GET_VALUE_SET('AXE_HCM_COMP_LDG_ID_VS'))
+CHANGE_CONTEXTS(LEGISLATIVE_DATA_GROUP_ID = l_us_ldg_id)
+(
+ l_stat_udt = GET_TABLE_VALUE('AXE_HCM_COMP_SALARY_STATUTORY_PERCENTAGE_UDT','STATUTORY_PERCENTAGE', l_country, 'XX')
+)
+
+if (l_stat_udt <> 'XX') then
+(
+ ELIGIBLE = 'Y'
+)
+
+return ELIGIBLE
+"

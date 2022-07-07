@@ -1,0 +1,71 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000036915589,"
+/******************************************************************************
+FORMULA NAME : AXE_HR_DESJARDINS_DIVISION_NAME_FF
+FORMULA TYPE : Extract Rule
+DESCRIPTION  : Calculations for Division Name in Desjardins Interface
+********************************************************************************
+Change History:
+Name                      Ver    Date           Description
+-------------            -----   -----------     --------------------------------------------
+Srinivas Thurakapalli  	 1.0     27-MAY-2019    Initial Version
+********************************************************************************/
+
+DEFAULT FOR DATA_ELEMENTS IS EMPTY_TEXT_TEXT
+INPUTS ARE DATA_ELEMENTS      (TEXT_TEXT)
+
+rule_value=' '
+l_div_name = ' '
+ 
+l_union = ' '
+l_pay_group = ' '
+l_work_province = ' '
+l_legal_emp = ' '
+l_union_code = ' '
+l_pay_group_code = ' '
+IF(DATA_ELEMENTS.EXISTS('Legal_Employer_Name')) THEN 
+(l_legal_emp=DATA_ELEMENTS['Legal_Employer_Name'])
+
+
+IF(DATA_ELEMENTS.EXISTS('Union_Code')) THEN 
+(l_union=DATA_ELEMENTS['Union_Code']
+l_union_code=SUBSTR(l_union,1,3))
+
+
+IF(DATA_ELEMENTS.EXISTS('Paygroup')) THEN 
+(l_pay_group_code=DATA_ELEMENTS['Paygroup']
+l_pay_group=SUBSTR(DATA_ELEMENTS['Paygroup'],1,3))
+
+IF(DATA_ELEMENTS.EXISTS('Employee_Province')) THEN 
+(l_work_province=DATA_ELEMENTS['Employee_Province'])
+
+
+
+
+IF (l_legal_emp='Anixter Canada Inc.' AND (l_union_code = ' ' or l_union_code = '979') AND  (l_pay_group = 'SBW' OR l_pay_group='HWK')  AND l_work_province <> 'QC') THEN   
+(l_div_name = '5413780001-100')
+
+
+IF (l_legal_emp='Anixter Canada Inc.' AND  (l_pay_group = 'SBW' OR l_pay_group='HWK') AND  (l_work_province = 'QC' OR l_union_code = 'MON' )) THEN   
+(l_div_name = '5413780001-105')
+
+IF (l_legal_emp='Anixter Canada Inc.' AND l_union_code = '362'  ) THEN   
+(l_div_name = '5413780001-100')
+
+IF (l_legal_emp='Anixter Canada Inc.' AND l_union_code = '213'  ) THEN   
+(l_div_name = '5413780001-103')
+
+
+IF (l_legal_emp='Anixter Power Solutions Canada Inc. (formerly HD Supply Canada Inc.)' AND (l_union_code = ' ' or l_union_code = '979')  AND (l_pay_group = 'PBW' OR l_pay_group='PWK') ) THEN   
+(l_div_name = '5413780003-100')
+
+
+IF (l_legal_emp='Anixter Power Solutions Canada Inc. (formerly HD Supply Canada Inc.)' AND l_union_code = '362'   ) THEN   
+(l_div_name = '5413780003-100')
+
+IF (l_legal_emp='Anixter Power Solutions Canada Inc. (formerly HD Supply Canada Inc.)' AND l_union_code = '213'   ) THEN   
+(l_div_name = '5413780003-103')
+
+rule_value = l_div_name
+
+RETURN rule_value"

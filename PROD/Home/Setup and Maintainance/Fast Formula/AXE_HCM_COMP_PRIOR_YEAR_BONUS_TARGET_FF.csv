@@ -1,0 +1,61 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000063997113,"
+/*********************************************************************************************
+Deloitte Changes Log
+**********************************************************************************************
+FORMULA NAME: AXE_HCM_COMP_PRIOR_YEAR_BONUS_TARGET_FF
+FORMULA TYPE: Compensation Default and Override
+DESCRIPTION : This formula determines the bonus target amount for Salary Review Plan                                        
+Name             Date                  Comments
+----------------------------------------------------------------------------------------------
+Tanvi Khadse     22-May-2020           Initial Version
+**********************************************************************************************/
+
+default for PER_ASG_LEGISLATION_CODE is 'XX'
+default for CMP_IV_PLAN_END_DATE is '4712/12/31 00:00:00' (date)
+default_data_value for ELEMENT_ENTRY_BASE_ELEMENT_NAME  is 'XX'
+default_data_value for ELEMENT_ENTRY_BASE_VALUE_NAME  is 'XX'
+default_data_value for ELEMENT_ENTRY_VALUE is '0'
+default_data_value for ELEMENT_ENTRY_INPUT_CURRENCY_CODE is 'XX'
+
+inputs are CMP_IV_PLAN_END_DATE (date)
+
+l_debug = 'Y'
+l_default_value = 0
+l_arr_index =1
+l_bonus_target = 0
+
+if CMP_IV_PLAN_END_DATE was not defaulted then
+(
+ l_effective_date = CMP_IV_PLAN_END_DATE
+)
+else
+(
+ l_effective_date = get_context(EFFECTIVE_DATE, '2020/01/01 00:00:00'(date))
+)
+  
+change_contexts(DATE_EARNED = l_effective_date,EFFECTIVE_DATE = l_effective_date)
+(
+ while ELEMENT_ENTRY_VALUE.exists(l_arr_index) loop
+ (
+  if (ELEMENT_ENTRY_BASE_ELEMENT_NAME[l_arr_index] = 'AXE '||PER_ASG_LEGISLATION_CODE||' Bonus Target '||ELEMENT_ENTRY_INPUT_CURRENCY_CODE[l_arr_index] and ELEMENT_ENTRY_BASE_VALUE_NAME[l_arr_index] = 'Amount') then
+  (
+   l_bonus_target = to_number(ELEMENT_ENTRY_VALUE[l_arr_index])
+   exit
+   if (l_debug = 'Y') then
+	(
+	 l_log = SET_LOG('ELEMENT_ENTRY_BASE_ELEMENT_NAME:'||ELEMENT_ENTRY_BASE_ELEMENT_NAME[l_arr_index])
+	 l_log = SET_LOG('ELEMENT_ENTRY_BASE_VALUE_NAME:'||ELEMENT_ENTRY_BASE_VALUE_NAME[l_arr_index])
+	 l_log = SET_LOG('l_bonus_target:'||to_char(l_bonus_target))
+	)
+  )
+  l_arr_index = l_arr_index + 1
+ )
+)
+
+l_default_value = l_bonus_target
+
+return l_default_value
+
+
+"

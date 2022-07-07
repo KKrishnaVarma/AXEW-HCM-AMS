@@ -1,0 +1,19 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000168532947,"
+/*************************************************************************************
+FORMULA NAME	: Biweekly
+FORMULA TYPE	: Flow Schedule
+DESCRIPTION	: Formula to return NEXT_SCHEDULED_DATE with 14 days frequency
+NEXT_SCHEDULED_DATE - This will be a date time value with yyyy-MM-dd HH:mm:ss format.
+***************************************************************************************/
+
+/* Inputs  */
+INPUTS ARE SUBMISSION_DATE(DATE), SCHEDULED_DATE(DATE)
+
+/* Calculations */
+NEXT_SCHEDULED_DATE = ADD_DAYS(SCHEDULED_DATE,14)
+   
+/* Returns */
+RETURN NEXT_SCHEDULED_DATE
+
+/* End Formula Text */"

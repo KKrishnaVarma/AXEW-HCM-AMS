@@ -1,0 +1,148 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000249152023,"
+/*****************************************************************
+FORMULA NAME: AXE_HCM_COMP_ELIGIBLE_SALARY_FF
+FORMULA TYPE: Compensation Default and Override
+DESCRIPTION : Fast Formula to determine the eligible salary for calculation of merit increase 
+LEGISLATIVE DATA GROUP: Global
+
+Name             Date       Description
+-------------------------------------------------------------------
+Sai Subhalaxmi  25-NOV-2021  Initial Version
+Sai Subhalaxmi   5-Jan-2021  Added Logic To Fetch ABBR Details
+*****************************************************************/
+DEFAULT FOR CMP_IV_PLAN_START_DATE                          IS '1951/01/01' (Date)
+DEFAULT FOR CMP_IV_PLAN_END_DATE                            IS '4712/12/31' (Date)
+DEFAULT FOR CMP_IV_PLAN_ELIG_DATE                           IS '4712/12/31' (Date)
+DEFAULT FOR PER_ASG_STATUS_USER_STATUS                      IS 'XXX'
+DEFAULT FOR PER_ASG_ASSIGNMENT_ID                           IS 0
+DEFAULT FOR PER_ASG_PERSON_ID                               IS 0
+DEFAULT FOR CMP_ASSIGNMENT_SALARY_BASIS_CODE                IS 'XX'
+DEFAULT FOR CMP_ASSIGNMENT_SALARY_BASIS_CODE_NAME           IS 'XX'
+DEFAULT FOR CMP_ASSIGNMENT_SALARY_AMOUNT                    IS 0
+DEFAULT FOR CMP_ASSIGNMENT_SALARY_ANNUALIZATION_FACTOR      IS 0
+DEFAULT FOR CMP_ASSIGNMENT_SALARY_FTE_VALUE                 IS 0
+DEFAULT FOR PER_ASG_FTE_VALUE                               IS 1
+DEFAULT FOR	PER_ASG_BUSINESS_UNIT_NAME                      IS 'X'
+DEFAULT_DATA_VALUE FOR PER_PERSON_EIT_ALL_PEI_INFORMATION1  IS 'NULL'
+DEFAULT_DATA_VALUE FOR PER_PERSON_EIT_ALL_PEI_INFORMATION4  IS 'NULL'
+DEFAULT_DATA_VALUE FOR PER_PERSON_EIT_ALL_PEI_INFORMATION_NUMBER1     IS 0
+DEFAULT_DATA_VALUE FOR PER_PERSON_EIT_ALL_PEI_INFORMATION_CATEGORY    IS 'NULL'
+
+INPUTS ARE CMP_IV_PLAN_START_DATE (DATE), CMP_IV_PLAN_END_DATE (DATE), CMP_IV_PLAN_ELIG_DATE (DATE)
+
+i                   = 1
+l_data_type         = 'CHARACTER'
+l_default_value     = '0'
+l_plan_start_date   = '1901/01/01'(date)
+l_plan_end_date     = '1901/01/01'(date)
+l_hr_extrctn_date   = '1901/01/01'(date)
+l_plan_start_date   = CMP_IV_PLAN_START_DATE
+l_plan_end_date     = CMP_IV_PLAN_END_DATE
+l_hr_extrctn_date 	= CMP_IV_PLAN_ELIG_DATE
+l_asg_id            = PER_ASG_ASSIGNMENT_ID
+l_debug_flag        = 'N'
+l_person_id         = PER_ASG_PERSON_ID
+l_annual_sal        = 0
+l_business_unit		= PER_ASG_BUSINESS_UNIT_NAME
+l_salary_amt        = 0
+
+CHANGE_CONTEXTS(EFFECTIVE_DATE= l_hr_extrctn_date,HR_ASSIGNMENT_ID=l_asg_id)
+( 
+l_asg_status = PER_ASG_STATUS_USER_STATUS
+)
+
+IF (l_debug_flag = 'Y') THEN
+(
+	l_data = SET_LOG('l_asg_status   			     : '|| l_asg_status)
+	l_data = SET_LOG('l_business_unit   	     : '|| l_business_unit)
+)
+
+IF(( l_asg_status = 'Leave - Payroll Eligible' OR l_asg_status = 'Leave - No Payroll') AND 
+(l_business_unit = 'US Accu-Tech Corporation' OR l_business_unit = 'US Anixter Inc., AIS, ITEL' OR l_business_unit = 'US Anixter Puerto Rico, Inc.' OR l_business_unit = 'US Tri Ed Puerto Rico' OR l_business_unit = 'CA Anixter Canada Inc.' OR l_business_unit = 'CA Anixter Power Solutions Canada Inc. (formerly HD Supply Canada Inc.)'))
+THEN 
+(
+WHILE PER_PERSON_EIT_ALL_PEI_INFORMATION_CATEGORY.EXISTS(i)
+	  AND PER_PERSON_EIT_ALL_PEI_INFORMATION4.EXISTS(i)
+	  AND PER_PERSON_EIT_ALL_PEI_INFORMATION_NUMBER1.EXISTS(i)
+	  AND PER_PERSON_EIT_ALL_PEI_INFORMATION1.EXISTS(i)
+LOOP 
+(
+    L_INFO_CAT = PER_PERSON_EIT_ALL_PEI_INFORMATION_CATEGORY[i]
+	L_INFO1    = PER_PERSON_EIT_ALL_PEI_INFORMATION1[i]
+	L_INFO4    = PER_PERSON_EIT_ALL_PEI_INFORMATION4[i]
+	L_SAL      = PER_PERSON_EIT_ALL_PEI_INFORMATION_NUMBER1[i]
+	
+	IF (l_debug_flag = 'Y') THEN
+	(
+		L_TEMP = ESS_LOG_WRITE('***********Loop Count = '||TO_CHAR(i)||'*****************')
+		L_TEMP = ESS_LOG_WRITE('Information Category  = '||L_INFO_CAT)
+		L_TEMP = ESS_LOG_WRITE('Information 1         = '||L_INFO1)
+		L_TEMP = ESS_LOG_WRITE('Employee Salary       = '||TO_CHAR(L_SAL))
+		L_TEMP = ESS_LOG_WRITE('*********** End Loop  = '||TO_CHAR(i)||'*****************')	
+	)
+		
+	IF (L_INFO_CAT = 'AXE_GBL_CONTEXT_1' AND L_INFO4  = 'Y' ) THEN
+	(
+	    l_salary_amt = L_SAL
+		IF (l_debug_flag = 'Y') THEN
+        (
+	      l_data = SET_LOG('Inside IF   			      ')
+		  l_data = SET_LOG('Information Category  = '||L_INFO_CAT)
+		  l_data = SET_LOG('Employee Salary       = '||TO_CHAR(L_SAL))
+        )
+		l_default_value = TO_CHAR(l_salary_amt)
+        RETURN 	l_default_value,l_data_type 
+	)
+	ELSE
+    (
+       CHANGE_CONTEXTS(EFFECTIVE_DATE= l_hr_extrctn_date,HR_ASSIGNMENT_ID=l_asg_id)
+       ( 
+         l_salary_amt = CMP_ASSIGNMENT_SALARY_AMOUNT
+       )
+    )
+		
+	i = i + 1	
+)
+)
+ELSE
+(
+CHANGE_CONTEXTS(EFFECTIVE_DATE= l_hr_extrctn_date,HR_ASSIGNMENT_ID=l_asg_id)
+( 
+l_salary_amt = CMP_ASSIGNMENT_SALARY_AMOUNT
+)
+)
+
+IF (l_debug_flag = 'Y') THEN
+(
+	l_data = SET_LOG('l_asg_status   			                 : '|| l_asg_status)
+	l_data = SET_LOG('l_hr_extrctn_date   			             : '|| TO_CHAR(l_hr_extrctn_date))
+	l_data = SET_LOG('l_salary_amt   			                 : '|| TO_CHAR(l_salary_amt))
+)
+
+CHANGE_CONTEXTS(EFFECTIVE_DATE = l_hr_extrctn_date)
+(
+ IF (CMP_ASSIGNMENT_SALARY_BASIS_CODE = 'HOURLY') THEN
+ (
+  l_annual_sal = l_salary_amt*2080
+ )
+ ELSE /*IF (CMP_ASSIGNMENT_SALARY_BASIS_CODE = 'ANNUAL' OR CMP_ASSIGNMENT_SALARY_BASIS_CODE = 'MONTHLY') then*/
+ (
+  l_annual_sal = l_salary_amt*CMP_ASSIGNMENT_SALARY_ANNUALIZATION_FACTOR
+ )
+ 
+ l_elig_sal = l_annual_sal
+ IF (l_debug_flag = 'Y') THEN
+ (
+	l_data = SET_LOG('CMP_ASSIGNMENT_SALARY_BASIS_CODE                        : '|| CMP_ASSIGNMENT_SALARY_BASIS_CODE)
+	l_data = SET_LOG('l_elig_sal   			                                  : '|| TO_CHAR(l_elig_sal))
+	l_data = SET_LOG('CMP_ASSIGNMENT_SALARY_ANNUALIZATION_FACTOR   			  : '|| TO_CHAR(CMP_ASSIGNMENT_SALARY_ANNUALIZATION_FACTOR))
+	l_data = SET_LOG('CMP_ASSIGNMENT_SALARY_FTE_VALUE   			          : '|| TO_CHAR(CMP_ASSIGNMENT_SALARY_FTE_VALUE))
+	l_data = SET_LOG('PER_ASG_FTE_VALUE   			                          : '|| TO_CHAR(PER_ASG_FTE_VALUE))
+	l_data = SET_LOG('CMP_ASSIGNMENT_SALARY_BASIS_CODE_NAME                   : '|| CMP_ASSIGNMENT_SALARY_BASIS_CODE_NAME)
+ )
+)
+
+l_default_value = TO_CHAR(l_elig_sal)
+
+RETURN 	l_default_value,l_data_type "

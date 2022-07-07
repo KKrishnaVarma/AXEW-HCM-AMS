@@ -1,0 +1,59 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000036915649,"
+/* ******************************************************************
+ * Formula Name     : AXE_HR_HOME_PHONE_NUM_RULE_FF
+ * Formula Type     : Extract Rule
+ * Description      : To get the Person Home Phone for the Person ID  
+ *
+ * Change History
+ * --------------
+ *
+ * Name 	                               Ver      Date         Description
+ *-----------------------------------     ------   ------------ ------------
+   Srinivas Thurakapalli                    1.0	   2019-Sep-18  Initial Draft
+***************************************************************************** */
+
+
+DEFAULT_DATA_VALUE for PER_EXT_PHONE_TYPE is 'null'
+DEFAULT_DATA_VALUE for PER_EXT_PHONE_NUMBER is 'null'
+DEFAULT_DATA_VALUE FOR PER_EXT_PHONE_DATE_FROM IS '4712/12/31 00:00:00' (date)
+DEFAULT_DATA_VALUE FOR PER_EXT_PHONE_DATE_TO IS '4712/12/31 00:00:00' (date)
+DEFAULT FOR PER_SYS_DATE_TIME IS 'DUMMY'  
+
+
+DEFAULT FOR DATA_ELEMENTS IS EMPTY_TEXT_TEXT
+
+INPUTS ARE DATA_ELEMENTS      (TEXT_TEXT)
+
+L_LAST_DAY_MONTH = '1902/01/01 00:00:00' (date)
+TRACE_FLAG = 'N'
+L_PERSON_ID = 0
+l_Phone_type = ' '
+
+
+L_LAST_DAY_MONTH=LAST_DAY(TO_DATE(SUBSTR(PER_SYS_DATE_TIME,1,10),'YYYY-MM-DD'))
+
+
+
+E_PERSON_ID = DATA_ELEMENTS['Person_ID']
+L_PERSON_ID = TO_NUMBER(E_PERSON_ID)
+
+if (DATA_ELEMENTS.EXISTS('Person_ID')) then
+(
+  I = 1
+  CHANGE_CONTEXTS(PERSON_ID = L_PERSON_ID)
+  
+  WHILE PER_EXT_PHONE_TYPE.EXISTS(I) LOOP
+  (
+  	IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' Inside While Loop '))
+    l_Phone_type = PER_EXT_PHONE_TYPE[I]
+    rule_value = PER_EXT_PHONE_NUMBER[I]
+	
+    if (l_Phone_type= 'H1' AND PER_EXT_PHONE_DATE_FROM[I] <= L_LAST_DAY_MONTH AND PER_EXT_PHONE_DATE_TO[I] >= L_LAST_DAY_MONTH) then
+    (
+       return rule_value
+	   EXIT
+    )
+    I = I + 1
+  )
+)"

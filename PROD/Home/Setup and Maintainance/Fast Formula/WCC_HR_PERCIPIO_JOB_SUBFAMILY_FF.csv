@@ -1,0 +1,26 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000171806281,"
+/***************************************************************************************************
+Formula Name: WCC_HR_PERCIPIO_JOB_SUBFAMILY_FF
+Formula Type: Extract Rule
+Description: Fetches Job Function Meaning based on Job Function
+Org/Developer                         Date         		Comments
+----------------------------------------------------------------------------------------------------
+Deloitte/Karthikeya Andey	       	1/20/2021   	Initial version
+***************************************************************************************************/
+DEFAULT FOR PER_ASG_JOB_FUNCTION_CODE IS ' '
+DEFAULT_DATA_VALUE FOR PER_EXT_JOB_FUNCTION_CODE_MEANING IS ' ' 
+
+rule_value			= ' '
+l_job_function_code	= ' '
+l_job_function		= ' '
+
+
+IF PER_ASG_JOB_FUNCTION_CODE WAS NOT DEFAULTED 
+THEN l_job_function_code = PER_ASG_JOB_FUNCTION_CODE
+
+l_job_function = GET_LOOKUP_MEANING('JOB_FUNCTION_CODE',l_job_function_code)
+
+rule_value = TRIM(l_job_function)
+
+RETURN rule_value"

@@ -1,0 +1,39 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000036915645,"
+/* ******************************************************************
+ * Formula Name     : AXE_HR_GET_PENSION_CODE_FF
+ * Formula Type     : Extract Rule
+ * Description      : Returns the Positoin Code from Value Set
+ *
+ * Change History
+ * --------------
+ *
+ * Name 	                               Ver      Date         Description
+ *-----------------------------------     ------   ------------ ------------
+   Abu Thahir                             1.0	   2019-July-22  Initial Draft
+************************************************************************** */
+
+
+DEFAULT FOR DATA_ELEMENTS IS EMPTY_TEXT_TEXT
+
+INPUTS ARE DATA_ELEMENTS (TEXT_TEXT)
+
+TRACE_FLAG = 'N'
+RULE_VALUE = '0000'
+
+
+IF DATA_ELEMENTS.EXISTS('Pension_Unit') AND DATA_ELEMENTS['Extra_Information_Type'] = 'AXE_US_PENSION_CONTEXT_2' THEN
+(
+S_PENSION = DATA_ELEMENTS['Pension_Unit']
+
+
+
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE('Position Description : '||S_PENSION))
+
+RULE_VALUE = GET_VALUE_SET('AXE_PENSION_CODE_VS','|=PENSION='''||S_PENSION) 
+
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' Position Code : '||RULE_VALUE ))
+
+
+RETURN RULE_VALUE
+)"

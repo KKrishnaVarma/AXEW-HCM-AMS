@@ -1,0 +1,28 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000171806276,"
+/***************************************************************************************************
+Formula Name: WCC_HR_IS_MANAGER_FLAG_FF
+Formula Type: Extract Rule
+Description : Fast Formula to identify if Employee has Reportees
+Extract Name: 
+Org/Developer                         Date         		Comments
+----------------------------------------------------------------------------------------------------
+Deloitte/Karthikeya Andey	       	2/2/2021   		Initial version
+***************************************************************************************************/
+l_manager_status    = ' '
+
+l_assginment_id         = GET_CONTEXT(HR_ASSIGNMENT_ID,1)
+l_assginment_id_ch      = TO_CHAR(l_assginment_id)
+
+l_effective_date 	= TRUNC(GET_CONTEXT(EFFECTIVE_DATE, '0001/01/01 00:00:00'(date)))
+l_effective_date_ch	= TO_CHAR(l_effective_date)
+
+l_manager_status = GET_VALUE_SET('WCC_HR_IS_MANAGER_FLAG_VS', '|=ASG_ID='
+								||l_assginment_id_ch
+								||'|EFF_DATE='
+								||l_effective_date_ch
+								||'|')
+
+rule_value = TRIM(l_manager_status)				
+
+RETURN rule_value"

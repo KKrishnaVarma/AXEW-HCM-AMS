@@ -1,0 +1,47 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000036915622,"
+/* ******************************************************************
+ * Formula Name     : AXE_HR_CONCUR_TRAVEL_CLASS_RULE_FF
+ * Formula Type     : Extract Rule
+ * Input            : Legislation_Code
+ * Returns          : Returns value from the UDT for column ""TRAVEL_CLASS"" if exists
+ *
+ * Change History
+ * --------------
+ *
+ * Name 	                               Ver      Date         Description
+ *-----------------------------------     ------   ------------ ------------
+   Abu Thahir                             1.0	   2019-Aug-15  Initial Draft
+************************************************************************** */
+
+
+DEFAULT FOR DATA_ELEMENTS IS EMPTY_TEXT_TEXT
+
+INPUTS ARE DATA_ELEMENTS (TEXT_TEXT)
+
+TRACE_FLAG = 'N'
+UDT_COL_VALUE='X'
+
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' Start - AXE_HR_CONCUR_TRAVEL_CLASS_RULE_FF '))
+IF (DATA_ELEMENTS.EXISTS('Legislation_Code')) THEN
+(
+S_LEG_CD = DATA_ELEMENTS['Legislation_Code']
+
+	IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' Legislation_Code : '|| S_LEG_CD ))
+
+	UDT_COL_VALUE = GET_TABLE_VALUE('AXE_HR_CONCUR_REGN_MAP_UDT','TRAVEL_CLASS',S_LEG_CD,'X') 
+
+	IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' UDT - TRAVEL_CLASS : '|| UDT_COL_VALUE ))
+
+	IF UDT_COL_VALUE = 'X' THEN
+		(
+		RULE_VALUE = ' '
+		)
+	ELSE
+		(
+		RULE_VALUE = UDT_COL_VALUE
+		)
+
+RETURN RULE_VALUE
+)
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' End - AXE_HR_CONCUR_TRAVEL_CLASS_RULE_FF '))"

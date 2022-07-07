@@ -1,0 +1,99 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000171806288,"
+/***************************************************************************************************
+Formula Name: WCC_HR_GLOBOFORCE_LOC_DET_FF
+Formula Type: Extract Rule
+Description : Fetches District, Group, Region, Business Leader Branch details based on Branch Code
+Org/Developer                         Date         		Comments
+----------------------------------------------------------------------------------------------------
+Deloitte/Shruti Krishnan		2/3/2021		Initial version
+Deloitte/Shruti Krishnan		3/3/2021		Changes made in Branch code Mapping
+Deloitte/Karthikeya Andey		6/23/2021		Fixed issue for blank Regions
+***************************************************************************************************/
+DEFAULT FOR DATA_ELEMENTS IS EMPTY_TEXT_TEXT
+
+INPUTS ARE DATA_ELEMENTS (TEXT_TEXT)
+
+l_rule_value	 = ' '
+
+l_branch_id	 	 = ' '
+l_branch_code	 = ' '
+l_branch_details = ' '
+
+l_district_id	    = ' '
+l_district_code	    = ' '
+l_district_details  = ' '
+
+l_group_id		= ' '
+l_group_code	= ' '
+l_group_details	= ' '
+
+l_region_id		 = ' '
+l_region_code	 = ' '
+l_region_details = ' '
+
+l_group_business_leader = ' '
+
+IF(DATA_ELEMENTS.EXISTS('Branch_Id')) THEN
+(
+	l_branch_id 	 = DATA_ELEMENTS['Branch_Id']
+	
+	/*l_branch_code    = GET_VALUE_SET('WCC_HR_LOOKUP_DESCRIPTION_VS', '|=P_LOOKUP_TYPE='
+								||'AXEW_BRANCH_ID'
+								||'|P_LOOKUP_CODE='
+								||l_branch_id
+								||'|')
+	
+	l_branch_details = TRIM(l_branch_id)||'-'||TRIM(l_branch_code)
+	
+	IF l_branch_details = '-' OR l_branch_details = '0-0'
+	THEN (l_branch_details = '-')*/  
+	l_branch_code    = GET_LOOKUP_MEANING('AXEW_BRANCH_ID',l_branch_id)
+	
+	l_branch_details = l_branch_code 
+ 
+	l_district_id		= GET_TABLE_VALUE('AXEW_HCM_WESCO_COA_MATRIX_UDT', 'AXEW_DISTRICT_ID', TRIM(l_branch_id), ' ')
+	
+	l_district_code     = GET_VALUE_SET('WCC_HR_LOOKUP_DESCRIPTION_VS', '|=P_LOOKUP_TYPE='
+								||'AXEW_DISTRICT_ID'
+								||'|P_LOOKUP_CODE='
+								||l_district_id
+								||'|')
+								
+	l_district_details	= TRIM(l_district_id)||'^'||TRIM(l_district_code)
+	
+	IF l_district_details = '^' OR l_district_details = '0^0'
+	THEN (l_district_details = '^')
+	
+	l_group_id	 	= GET_TABLE_VALUE('AXEW_HCM_WESCO_COA_MATRIX_UDT', 'AXEW_GROUP_ID', TRIM(l_branch_id), ' ')
+	
+	l_group_code	= GET_VALUE_SET('WCC_HR_LOOKUP_DESCRIPTION_VS', '|=P_LOOKUP_TYPE='
+								||'AXEW_GROUP_ID'
+								||'|P_LOOKUP_CODE='
+								||l_group_id
+								||'|')
+								
+	l_group_details = TRIM(l_group_id)||'^'||TRIM(l_group_code)
+	
+	IF l_group_details = '^' OR l_group_details = '0^0'
+	THEN (l_group_details = '^')
+
+	l_region_id	 	= GET_TABLE_VALUE('AXEW_HCM_WESCO_COA_MATRIX_UDT', 'AXEW_REGION_ID', TRIM(l_branch_id), ' ')
+	
+	l_region_code	= GET_VALUE_SET('WCC_HR_LOOKUP_DESCRIPTION_VS', '|=P_LOOKUP_TYPE='
+								||'AXEW_REGION_ID'
+								||'|P_LOOKUP_CODE='
+								||l_region_id
+								||'|')
+								
+	l_region_details = TRIM(l_region_id)||'^'||TRIM(l_region_code)
+	
+	IF l_region_details = '^' OR l_region_details = '0^0'
+	THEN (l_region_details = '^')
+	
+	l_rule_value =TRIM(l_group_details)||'^'||TRIM(l_region_details)||'^'||TRIM(l_district_details)||'^'||TRIM(l_branch_details)||'^'
+)
+
+RULE_VALUE = TRIM(l_rule_value)
+
+RETURN RULE_VALUE"

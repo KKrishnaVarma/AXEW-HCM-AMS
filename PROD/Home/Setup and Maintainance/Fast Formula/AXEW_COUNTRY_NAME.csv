@@ -1,0 +1,71 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000302365163,"
+/* ******************************************************************
+ * Formula Name     : AXEW_COUNTRY_NAME
+ * Formula Type     : Extract Rule
+ * Description      : Returns Country Name based on Legislation Code
+ *
+ * Change History
+ * --------------
+ *
+ * Name 	                               Ver      Date         Description
+ *-----------------------------------     ------   ------------ ------------
+   Manish Chauhan                         1.0	   25-Feb-2022  Initial Draft
+************************************************************************** */
+
+
+DEFAULT FOR DATA_ELEMENTS IS EMPTY_TEXT_TEXT
+
+INPUTS ARE DATA_ELEMENTS (TEXT_TEXT)
+
+TRACE_FLAG = 'N'
+S_LE_NAME = ' '
+RULE_VALUE = ' '
+
+IF (DATA_ELEMENTS.EXISTS('Legislation_Code')) THEN
+(
+	L_LE_Code = DATA_ELEMENTS['Legislation_Code']
+
+	IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE('Legislation Code : '||L_LE_Code))
+	
+    RULE_VALUE = GET_VALUE_SET('AXEW_COUNTRY_NAME','|=Legislation_Code='''||L_LE_Code||'''')	
+	
+	IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE('Country Name: '||RULE_VALUE ))
+
+	RETURN RULE_VALUE
+) "
+300000302365163,"
+/* ******************************************************************
+ * Formula Name     : AXEW_COUNTRY_NAME
+ * Formula Type     : Extract Rule
+ * Description      : Returns Country Name based on Legislation Code
+ *
+ * Change History
+ * --------------
+ *
+ * Name 	                               Ver      Date         Description
+ *-----------------------------------     ------   ------------ ------------
+   Manish Chauhan                         1.0	   25-Feb-2022  Initial Draft
+************************************************************************** */
+
+
+DEFAULT FOR DATA_ELEMENTS IS EMPTY_TEXT_TEXT
+
+INPUTS ARE DATA_ELEMENTS (TEXT_TEXT)
+
+TRACE_FLAG = 'N'
+S_LE_NAME = ' '
+RULE_VALUE = ' '
+
+IF (DATA_ELEMENTS.EXISTS('Legislation_Code')) THEN
+(
+	L_LE_Code = DATA_ELEMENTS['Legislation_Code']
+
+	IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE('Legislation Code : '||L_LE_Code))
+	
+    RULE_VALUE = GET_VALUE_SET('AXEW_COUNTRY_NAME','|=Legislation_Code='''||L_LE_Code||'''')	
+	
+	IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE('Country Name: '||RULE_VALUE ))
+
+	RETURN RULE_VALUE
+) "

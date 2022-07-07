@@ -1,0 +1,122 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000036915598,"
+/******************************************************************************
+FORMULA NAME : AXE_HR_DESJ_EMPL_STATUS_FF
+FORMULA TYPE : Extract Rule
+DESCRIPTION  : Derives Employee status
+********************************************************************************
+Change History:
+Name                      Ver    Date           Description
+-------------            -----   -----------     --------------------------------------------
+Srinivas Thurakapalli  	 1.0     27-MAY-2019    Initial Version
+********************************************************************************/
+
+DEFAULT FOR DATA_ELEMENTS IS EMPTY_TEXT_TEXT
+INPUTS ARE DATA_ELEMENTS      (TEXT_TEXT)
+
+rule_value=' '
+l_empl_status = ' '
+ 
+l_union = ' '
+l_pay_group = ' '
+l_work_province = ' '
+l_legal_emp = ' '
+l_start_date= ' '
+l_start_date_dt ='1900-01-01T00:00:00.000Z' (DATE)
+l_end_date_dt ='1900-01-01T00:00:00.000Z' (DATE) 
+l_end_date = ' '
+l_context_Code = ' '
+l_Person_Extra_Info1 = ' '
+l_Person_Extra_Info1 = ' '
+l_pay_to_date = ' '
+l_pay_to_date_dt ='1900-01-01T00:00:00.000Z' (DATE) 
+l_actual_term_date = ' '
+l_person_info_date2 = ' '
+l_union_code = ' '
+
+IF(DATA_ELEMENTS.EXISTS('Legal_Employer_Name')) THEN 
+(l_legal_emp=DATA_ELEMENTS['Legal_Employer_Name'])
+
+
+IF(DATA_ELEMENTS.EXISTS('Union_Code')) THEN 
+(l_union=DATA_ELEMENTS['Union_Code']
+ l_union_code=substr(l_union,1,3))
+
+
+IF(DATA_ELEMENTS.EXISTS('Paygroup')) THEN 
+(l_pay_group=DATA_ELEMENTS['Paygroup'])
+
+
+IF(DATA_ELEMENTS.EXISTS('Employee_Province')) THEN 
+(l_work_province=DATA_ELEMENTS['Employee_Province'])
+
+
+IF(DATA_ELEMENTS.EXISTS('Assignment_Status_Type')) THEN 
+(l_assgn_sts_type=DATA_ELEMENTS['Assignment_Status_Type'])
+
+
+IF(DATA_ELEMENTS.EXISTS('Assignment_Status_Code')) THEN 
+(l_assgn_sts_code=DATA_ELEMENTS['Assignment_Status_Code'])
+
+
+IF(DATA_ELEMENTS.EXISTS('Action_Code')) THEN 
+(l_action_code=DATA_ELEMENTS['Action_Code'])
+
+
+IF(DATA_ELEMENTS.EXISTS('Override_Start_date')) THEN
+(	l_start_date=DATA_ELEMENTS['Override_Start_date']
+l_start_date_dt = TO_DATE(SUBSTR(l_start_date,1,10),'YYYY/MM/DD'))
+
+
+
+IF(DATA_ELEMENTS.EXISTS('Override_End_date')) THEN
+(	l_end_date=DATA_ELEMENTS['Override_End_date']
+l_end_date_dt = TO_DATE(SUBSTR(l_end_date,1,10),'YYYY/MM/DD'))
+
+IF(DATA_ELEMENTS.EXISTS('Context_Code')) THEN
+(	l_context_Code=DATA_ELEMENTS['Context_Code'])
+
+IF(DATA_ELEMENTS.EXISTS('Person_Extra_Info1')) THEN
+(	l_Person_Extra_Info1=DATA_ELEMENTS['Person_Extra_Info1'])
+
+
+IF(DATA_ELEMENTS.EXISTS('Person_Info_Date2')) THEN
+(	l_person_info_date2=DATA_ELEMENTS['Person_Info_Date2'])
+
+
+l_effective_date=GET_CONTEXT(EFFECTIVE_DATE, '4712-12-31T00:00:00.000Z' (DATE))
+
+
+
+ IF l_context_Code <>' ' THEN
+(
+IF ( (l_start_date_dt <= l_effective_date  AND l_end_date_dt >= l_effective_date) AND l_Person_Extra_Info1 ='Leave without Benefits' ) THEN   
+(l_empl_status = '03')
+IF ( (l_start_date_dt <= l_effective_date AND l_end_date_dt >= l_effective_date) AND l_Person_Extra_Info1 ='LTD' ) THEN   
+(l_empl_status = '04')
+IF ( (l_start_date_dt <= l_effective_date AND l_end_date_dt >= l_effective_date) AND l_Person_Extra_Info1 ='Maternal/Paternal Leave' ) THEN   
+(l_empl_status = '06')
+IF ( (l_start_date_dt <= l_effective_date AND l_end_date_dt >= l_effective_date) AND l_Person_Extra_Info1 ='Term with Benefits' ) THEN   
+(l_empl_status = '09')
+IF ( (l_start_date_dt <= l_effective_date AND l_end_date_dt >= l_effective_date) AND l_Person_Extra_Info1 ='Leave with Benefits' ) THEN   
+(l_empl_status = '10')
+IF ((l_start_date_dt <= l_effective_date AND l_end_date_dt >= l_effective_date) AND l_Person_Extra_Info1 ='Layoff with benefits' ) THEN   
+(l_empl_status = '01')
+)
+ELSE 
+(
+IF (l_assgn_sts_type = 'ACTIVE' OR (l_assgn_sts_type ='SUSPENDED' AND l_assgn_sts_code<>'AXE_SUSPEND_LAYOFF')) THEN
+(l_empl_status = '01')
+ IF (l_assgn_sts_type = 'SUSPENDED'AND l_assgn_sts_code='AXE_SUSPEND_LAYOFF') THEN 
+(l_empl_status = '13')
+ IF (l_assgn_sts_type = 'INACTIVE'AND l_action_code='DEATH' ) THEN 
+(l_empl_status = '08')
+ IF (l_assgn_sts_type = 'INACTIVE'AND l_action_code<>'DEATH' ) THEN 
+(l_empl_status = '02')
+)
+
+
+
+rule_value = l_empl_status
+
+RETURN rule_value"

@@ -1,0 +1,80 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000036915640,"
+/* ******************************************************************
+ * Formula Name     : AXE_HR_MGR_DETAILS_RULE_FF
+ * Rice ID          : HCM_I034
+ * Formula Type     : Extract Rule
+ * Description      : To get the latest Manager's Employee Id & Name before termination row.  
+ *
+ * Change History
+ * --------------
+ *
+ * Name 	                               Ver      Date         Description
+ *-----------------------------------     ------   ------------ ------------
+   Abu Thahir                             1.0	   2019-Jun-11  Initial Draft
+***************************************************************************** */
+
+
+
+DEFAULT_DATA_VALUE FOR PER_EXT_MGR_PERSON_NUMBER IS 'NO DATA'
+DEFAULT_DATA_VALUE FOR PER_EXT_MGR_DISPLAY_NAME IS 'NO DATA'
+
+INPUTS ARE DATA_ELEMENTS (TEXT_TEXT)
+
+TRACE_FLAG = 'N'
+L_PERSON_ID = 0
+MGR_Person_Nbr = 'NO DATA'
+MGR_Person_Name = 'NO DATA'
+
+E_PERSON_ID = DATA_ELEMENTS['Person_ID']
+L_PERSON_ID = TO_NUMBER(E_PERSON_ID)
+
+
+IF (DATA_ELEMENTS.EXISTS('ACTUAL_TERMINATION_DATE')) THEN
+(
+
+L_COUNTER = PER_HIST_ASG_ASSIGNMENT_ID.LAST(-1) 
+
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' Person ID is '||E_PERSON_ID ))
+
+
+CHANGE_CONTEXTS(PERSON_ID = L_PERSON_ID)
+(
+              WHILE (PER_HIST_ASG_ASSIGNMENT_ID.EXISTS(L_COUNTER)) LOOP
+              (
+                 IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' Inside While Loop '))
+                 
+                           L_HIST_ASS_ID = PER_HIST_ASG_ASSIGNMENT_ID[L_COUNTER]
+                           L_HIST_ASS_START = PER_HIST_ASG_EFFECTIVE_START_DATE[L_COUNTER]
+						   IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' L_HIST_ASS_ID is '|| TO_CHAR(L_HIST_ASS_ID) || ' , ' ||' L_HIST_ASS_START is '|| TO_CHAR(L_HIST_ASS_START)  )) 
+
+                           IF (PER_HIST_ASG_ASSIGNMENT_TYPE[L_COUNTER] = 'E' AND PER_HIST_ASG_STATUS_TYPE[L_COUNTER] = 'ACTIVE') THEN
+                           (
+                                  CHANGE_CONTEXTS(EFFECTIVE_DATE= L_HIST_ASS_START, HR_ASSIGNMENT_ID = L_HIST_ASS_ID) 
+                                   (            
+                                    IF PER_EXT_MGR_PERSON_NUMBER.EXISTS(1) THEN (MGR_Person_Nbr  = PER_EXT_MGR_PERSON_NUMBER[1])
+                                    IF PER_EXT_MGR_DISPLAY_NAME.EXISTS(1) THEN (MGR_Person_Name = PER_EXT_MGR_DISPLAY_NAME[1])
+                                   )
+                            EXIT
+                           )
+              L_COUNTER = PER_HIST_ASG_ASSIGNMENT_ID.PRIOR(L_COUNTER, -1) 
+              )
+)
+
+
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' MGR Id is '|| MGR_Person_Nbr || ' , ' || ' MGR Name is '|| MGR_Person_Name )) 
+
+
+IF (MGR_Person_Nbr <> 'NO DATA' AND MGR_Person_Name <> 'NO DATA') THEN
+(
+RULE_VALUE = (MGR_Person_Nbr || '-' || MGR_Person_Name )
+)
+ELSE
+(
+RULE_VALUE = ' '
+)
+
+
+RETURN RULE_VALUE  
+
+)"

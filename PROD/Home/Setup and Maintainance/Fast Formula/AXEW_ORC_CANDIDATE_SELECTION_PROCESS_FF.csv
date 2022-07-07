@@ -1,0 +1,39 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000103440040,"
+/***************************************************************************************************
+Formula Name: AXEW_ORC_CANDIDATE_SELECTION_PROCESS_FF
+Formula Type: Recruiting Candidate Selection Process
+Description : Fast Formula to determine if an automated action will be executed to move job applications
+Org/Developer                         Date         		Comments
+----------------------------------------------------------------------------------------------------
+Deloitte/Karthikeya Andey	       	3/10/2021   	Initial Version
+Deloitte/Karthikeya Andey	       	7/16/2021   	Updated code based on latest requirements
+***************************************************************************************************/
+DEFAULT FOR IRC_CSP_JOBAPP_PRESCREEN_SCORE IS 0
+DEFAULT FOR IRC_CSP_JOBAPP_PRESCREEN_MAX_SCORE IS 0
+
+DEFAULT_DATA_VALUE FOR IRC_CSP_JOBAPP_PRESCREEN_RESPONSE_ANSWER_SCORE IS 0 /*Score for an answer to a prescreening question*/
+DEFAULT_DATA_VALUE FOR IRC_CSP_JOBAPP_PRESCREEN_RESPONSE_QSTN_SCORE IS 0 /*Score obtained by the candidate for a prescreening question*/
+DEFAULT_DATA_VALUE FOR IRC_CSP_JOBAPP_PRESCREEN_RESPONSE_QSTN_CODE IS ' ' /*Prescreening question answered by the candidate Code*/
+
+CONDITION_RESULT	= 0
+CONDITION_MESSAGE	= 'Candidate Selection Prescreen Max Score: '||TO_CHAR(IRC_CSP_JOBAPP_PRESCREEN_MAX_SCORE) ||' - Prescreen Score: '|| TO_CHAR(IRC_CSP_JOBAPP_PRESCREEN_SCORE)
+
+/*
+PC_SCORE            = 0
+PC_SCORE 			= (IRC_CSP_JOBAPP_PRESCREEN_SCORE/IRC_CSP_JOBAPP_PRESCREEN_MAX_SCORE) * 100
+CONDITION_MESSAGE 	= CONDITION_MESSAGE || ' - SCORE: '|| TO_CHAR(ROUND_UP(PC_SCORE))
+IF (ROUND_UP(PC_SCORE) = 100) THEN (CONDITION_RESULT  = 0)
+*/
+
+l_arr_index = IRC_CSP_JOBAPP_PRESCREEN_RESPONSE_QSTN_SCORE.FIRST(-1)
+WHILE IRC_CSP_JOBAPP_PRESCREEN_RESPONSE_QSTN_SCORE.EXISTS(l_arr_index) LOOP
+(
+	IF(IRC_CSP_JOBAPP_PRESCREEN_RESPONSE_QSTN_SCORE[l_arr_index] = -100) THEN
+	(
+		CONDITION_RESULT = 1
+	)
+	l_arr_index = IRC_CSP_JOBAPP_PRESCREEN_RESPONSE_QSTN_SCORE.NEXT(l_arr_index, -1)
+)
+
+RETURN CONDITION_RESULT, CONDITION_MESSAGE"

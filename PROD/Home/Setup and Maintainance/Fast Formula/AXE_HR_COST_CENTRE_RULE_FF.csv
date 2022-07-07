@@ -1,0 +1,91 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000036915625,"
+/******************************************************************************
+FORMULA NAME : AXE_HR_COST_CENTRE_RULE_FF
+FORMULA TYPE : Extract Rule
+DESCRIPTION  : Derives Cost Centre value based on LegalEmployer,PL Location and PL Dept
+********************************************************************************
+Change History:
+Name                      Ver    Date           Description
+-------------            -----   -----------     --------------------------------------------
+Srinivas Thurakapalli  	 1.0     03-Sep-2019    Initial Version
+********************************************************************************/
+
+DEFAULT FOR DATA_ELEMENTS IS EMPTY_TEXT_TEXT
+INPUTS ARE DATA_ELEMENTS      (TEXT_TEXT)
+
+rule_value=' '
+
+ 
+l_legal_entity = ' '
+l_PL_Loc = ' '
+l_PL_Dept = ' '
+L_COST_CENTRE = ' '
+L_HCM_DEP = ' '
+L_SITE = ' '
+L_DIVISON = ' '
+L_PROJECT_ID = ' '
+L_EXT_ATB1 = ' '
+L_EXT_ATB2 = ' '
+L_IS_OLD_COA=GET_PARAMETER_VALUE('OLD_COA')
+(
+
+IF(DATA_ELEMENTS.EXISTS('LegalEntity')) THEN 
+(l_legal_entity=DATA_ELEMENTS['LegalEntity'])
+
+
+IF(DATA_ELEMENTS.EXISTS('LegacyPLLocation')) THEN 
+(l_PL_Loc=DATA_ELEMENTS['LegacyPLLocation']
+ )
+
+									
+
+IF(DATA_ELEMENTS.EXISTS('LegacyPLDepartment')) THEN 
+(l_PL_Dept=DATA_ELEMENTS['LegacyPLDepartment']
+)
+
+IF(DATA_ELEMENTS.EXISTS('HCM_Department')) THEN 
+(S_HCM_DEP=DATA_ELEMENTS['HCM_Department']
+L_HCM_DEP = SUBSTR(S_HCM_DEP,1,5)
+ )
+
+
+IF(DATA_ELEMENTS.EXISTS('Site')) THEN 
+(L_SITE=DATA_ELEMENTS['Site']
+ )
+
+
+IF(DATA_ELEMENTS.EXISTS('Division')) THEN 
+(L_DIVISON=DATA_ELEMENTS['Division']
+ )
+
+
+IF(DATA_ELEMENTS.EXISTS('Project_ID')) THEN 
+(L_PROJECT_ID=DATA_ELEMENTS['Project_ID']
+ )
+
+
+IF(DATA_ELEMENTS.EXISTS('Extra_Attribute1')) THEN 
+(L_EXT_ATB1=DATA_ELEMENTS['Extra_Attribute1']
+ )
+
+
+IF(DATA_ELEMENTS.EXISTS('Extra_Attribute2')) THEN 
+(L_EXT_ATB2=DATA_ELEMENTS['Extra_Attribute2']
+ )
+				 
+IF L_IS_OLD_COA = 'Y' THEN
+( 
+L_COST_CENTRE=l_legal_entity||l_PL_Loc||l_PL_Dept
+)
+ELSE
+(
+L_COST_CENTRE=l_legal_entity||L_HCM_DEP||L_SITE||L_DIVISON||L_PROJECT_ID||L_EXT_ATB1||L_EXT_ATB2
+)
+	
+)
+rule_value = L_COST_CENTRE
+
+RETURN rule_value
+ 
+"

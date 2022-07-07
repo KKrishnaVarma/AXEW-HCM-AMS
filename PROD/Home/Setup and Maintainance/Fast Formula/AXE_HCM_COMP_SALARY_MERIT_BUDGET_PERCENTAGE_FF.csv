@@ -1,0 +1,30 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000063997108,"
+/************************************************************************************************
+Deloitte Changes Log
+*************************************************************************************************
+FORMULA NAME: AXE_HCM_COMP_SALARY_MERIT_BUDGET_PERCENTAGE_FF
+FORMULA TYPE: Compensation Default and Override
+DESCRIPTION : This formula determines the merit budget percentage for Annual Salary Review Plan                                        
+Name             Date                  Comments
+-------------------------------------------------------------------------------------------------
+Tanvi Khadse     13-May-2020           Initial Version
+*************************************************************************************************/
+
+default for PER_ASG_LEGISLATION_CODE is 'XX'
+
+l_country = PER_ASG_LEGISLATION_CODE
+l_us_ldg_id = 0
+l_budget_percent = 0
+l_default_value = 0
+
+l_us_ldg_id = to_number(GET_VALUE_SET('AXE_HCM_COMP_LDG_ID_VS'))
+CHANGE_CONTEXTS(LEGISLATIVE_DATA_GROUP_ID = l_us_ldg_id)
+(
+ l_budget_percent = to_number(GET_TABLE_VALUE('AXE_HCM_COMP_SALARY_MERIT_BUDGET_PERCENTAGE_UDT','BUDGET_PERCENTAGE', l_country, '0'))
+)
+
+l_default_value = l_budget_percent 
+
+return l_default_value
+"

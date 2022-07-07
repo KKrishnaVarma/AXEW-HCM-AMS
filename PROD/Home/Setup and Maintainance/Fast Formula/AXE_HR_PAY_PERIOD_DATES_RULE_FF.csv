@@ -1,0 +1,43 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000036915652,"
+/* ******************************************************************
+ * Formula Name     : AXE_HR_PAY_PERIOD_DATES_RULE_FF
+ * Formula Type     : Extract Rule
+ * Description      : Returns the Payroll Check date.
+ *
+ * Change History
+ * --------------
+ *
+ * Name 	                          Ver      Date          Description
+ *-----------------------------------     ------   ------------ ------------
+   Srinivas Thurakapalli              1.0	   2019-Sep-19  Initial Draft
+************************************************************************** */
+
+
+DEFAULT FOR DATA_ELEMENTS IS EMPTY_TEXT_TEXT
+
+INPUTS ARE DATA_ELEMENTS (TEXT_TEXT)
+
+TRACE_FLAG = 'N'
+RULE_VALUE = 'X'
+L_PAYROLL_TERM_ID = ' '
+L_PERIOD_NAME = ' '
+IF DATA_ELEMENTS.EXISTS('Payroll_Term_Id') THEN
+(
+L_PAYROLL_TERM_ID = DATA_ELEMENTS['Payroll_Term_Id']
+
+IF DATA_ELEMENTS.EXISTS('Pay_Period_Name') THEN
+(
+L_PERIOD_NAME= DATA_ELEMENTS['Pay_Period_Name']
+)
+
+
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE('Payroll Term Id : '||L_PAYROLL_TERM_ID))
+
+RULE_VALUE = GET_VALUE_SET('AXE_PAY_PERIOD_DATES_VS','|=PAYROLL_TERM_ID='''||L_PAYROLL_TERM_ID||''''||'|PERIOD_NAME='''||L_PERIOD_NAME||'''') 
+           
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' Payroll Reporting Name : '||RULE_VALUE ))
+)
+
+ 
+RETURN RULE_VALUE"

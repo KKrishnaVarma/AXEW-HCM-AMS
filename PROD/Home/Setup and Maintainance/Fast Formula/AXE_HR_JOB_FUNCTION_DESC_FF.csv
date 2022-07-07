@@ -1,0 +1,31 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000094084375,"
+/* ******************************************************************
+ * Formula Name     : AXE_HR_JOB_FUNCTION_DESC_FF
+ * Formula Type     : Extract Rule
+ * Description      : Returns the JOB FUNCTION desc
+ *
+ * Change History
+ * --------------
+ *
+ * Name 	                          Ver      Date              Description
+ *-----------------------------------     ------   ------------ ------------
+   Manish                            1.0	   2021-April-26    Initial Draft
+************************************************************************** */
+
+
+DEFAULT FOR DATA_ELEMENTS IS EMPTY_TEXT_TEXT
+
+INPUTS ARE DATA_ELEMENTS (TEXT_TEXT)
+
+TRACE_FLAG = 'Y'
+RULE_VALUE = ' '
+
+IF DATA_ELEMENTS.EXISTS('JOB_FUNCTION') THEN
+(
+JOB_FUNCTION_CODE = DATA_ELEMENTS['JOB_FUNCTION']
+IF TRACE_FLAG = 'N' THEN (RET = ESS_LOG_WRITE('JOB_FUNCTION : '||JOB_FUNCTION_CODE))
+RULE_VALUE = GET_LOOKUP_MEANING('JOB_FUNCTION_CODE',JOB_FUNCTION_CODE)           
+IF TRACE_FLAG = 'N' THEN (RET = ESS_LOG_WRITE(' JOB_FUNCTION DESC : '||RULE_VALUE ))
+)
+RETURN RULE_VALUE"

@@ -1,0 +1,34 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000171806293,"
+/***************************************************************************************************
+Formula Name: WCC_HR_ERP_ASSIGNMENTS_LEDGER_FF
+Formula Type: Extract Rule
+Description : Fetches Employee Ledger based on Branch Code
+Extract Name: WCC_HR_ERP_ASSIGNMENTS_STG_EXTRACT
+Org/Developer                         Date         		Comments
+----------------------------------------------------------------------------------------------------
+Deloitte/Shruti Krishnan	       	4/1/2021   	  Initial version
+***************************************************************************************************/
+DEFAULT FOR DATA_ELEMENTS IS EMPTY_TEXT_TEXT
+
+INPUTS ARE DATA_ELEMENTS (TEXT_TEXT)
+
+l_rule_value	 = ' '
+
+l_ledger_id	 = ' '
+
+IF(DATA_ELEMENTS.EXISTS('BRANCH_CODE')) THEN
+(
+	l_branch_id 	 = DATA_ELEMENTS['BRANCH_CODE']
+	
+	
+	l_ledger_id      = GET_TABLE_VALUE('AXEW_HCM_WESCO_COA_MATRIX_UDT', 'AXEW_LEDGER_NAME', TRIM(l_branch_id), ' ')
+	
+	
+	l_rule_value = l_ledger_id
+	
+)
+
+RULE_VALUE = TRIM(l_rule_value)
+
+RETURN RULE_VALUE"

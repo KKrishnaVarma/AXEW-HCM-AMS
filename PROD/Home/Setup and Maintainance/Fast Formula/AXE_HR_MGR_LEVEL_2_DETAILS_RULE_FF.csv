@@ -1,0 +1,72 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000036915647,"
+/* ******************************************************************
+ * Formula Name     : AXE_HR_MGR_LEVEL_2_DETAILS_RULE_FF
+ * Rice ID          : HCM_I032
+ * Formula Type     : Extract Rule
+ * Description      : To determine the level2 manager Person Number, First Name, last Name. 
+ *                    
+ *
+ 
+ * Change History
+ * --------------
+ *
+ * Name 	                               Ver      Date         Description
+ *-----------------------------------     ------   ------------ ------------
+   Srinivas Thurakapalli                   1.0	   2019-Jul-02  Initial Draft
+   Sharma Ravi Subhash                     2.0     2019-Aug-24  Changes for termination cases.
+***************************************************************************** */
+
+DEFAULT FOR PER_ASG_MGR_MANAGER_ASG_ID IS 0
+DEFAULT FOR PER_ASG_FIRST_NAME IS 'X'
+DEFAULT FOR PER_ASG_MGR_FIRST_NAME IS 'NO DATA'
+DEFAULT FOR PER_ASG_MGR_LAST_NAME IS 'NO DATA'
+DEFAULT FOR PER_ASG_ASSIGNMENT_STATUS_TYPE IS 'NO DATA'
+DEFAULT FOR PER_ASG_REL_ACTUAL_TERMINATION_DATE IS '1951/01/01 00:00:00'(date) 
+DEFAULT FOR PER_ASG_MGR_PERSON_NUMBER IS 'NO DATA'
+	
+
+L_ACT_TERMINATION_DATE = ADD_DAYS(PER_ASG_REL_ACTUAL_TERMINATION_DATE,-1)
+TRACE_FLAG = 'Y' 
+IF PER_ASG_ASSIGNMENT_STATUS_TYPE != 'INACTIVE' THEN
+(
+CHANGE_CONTEXTS(HR_ASSIGNMENT_ID = PER_ASG_MGR_MANAGER_ASG_ID) 
+	(
+	IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' HR_ASSIGNMENT_ID = '|| TO_CHAR(PER_ASG_MGR_MANAGER_ASG_ID)))
+	L_MGR_FIRST_NAME  = PER_ASG_MGR_FIRST_NAME
+	L_MGR_LAST_NAME  = PER_ASG_MGR_LAST_NAME
+	L_MGR_PERSON_NUMBER  = PER_ASG_MGR_PERSON_NUMBER
+	)
+
+)
+ELSE 
+(
+CHANGE_CONTEXTS(EFFECTIVE_DATE = L_ACT_TERMINATION_DATE)
+(
+CHANGE_CONTEXTS(HR_ASSIGNMENT_ID = PER_ASG_MGR_MANAGER_ASG_ID) 
+	(	
+	IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' HR_ASSIGNMENT_ID_INACTIVE= '|| TO_CHAR(PER_ASG_MGR_MANAGER_ASG_ID)))
+	L_MGR_FIRST_NAME  = PER_ASG_MGR_FIRST_NAME
+	L_MGR_LAST_NAME  = PER_ASG_MGR_LAST_NAME
+	L_MGR_PERSON_NUMBER  = PER_ASG_MGR_PERSON_NUMBER
+	)
+	)
+	)
+
+
+IF (L_MGR_PERSON_NUMBER <> 'NO DATA') THEN
+(
+RULE_VALUE = (L_MGR_PERSON_NUMBER || '-' || L_MGR_FIRST_NAME || '-' || L_MGR_LAST_NAME)
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' RULE_VALUE = '|| RULE_VALUE))
+)
+ELSE
+(
+RULE_VALUE = ' '
+)
+
+
+RETURN RULE_VALUE  
+
+
+ 
+"

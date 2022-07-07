@@ -1,0 +1,69 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000241178526,"
+/* ******************************************************************
+ * Formula Name     : AXE_HR_PRIMARY_PHONE_TYPE_FF
+ * Rice ID          : HCM
+ * Formula Type     : Extract Rule
+ * Description      : Get the Primary Phone Type of an employee  
+ *
+ * Change History
+ * --------------
+ *
+ * Name 	                               Ver      Date         Description
+ *-----------------------------------     ------   ------------ ------------
+   Manish Chauhan                          1.0	   2021-Nov-17  Initial Draft
+***************************************************************************** */
+
+
+
+DEFAULT FOR DATA_ELEMENTS IS EMPTY_TEXT_TEXT
+DEFAULT_DATA_VALUE FOR PER_EXT_HIST_PHONE_TYPE IS 'H'
+DEFAULT_DATA_VALUE FOR PER_EXT_HIST_PHONE_ID IS 0 
+
+INPUTS ARE DATA_ELEMENTS (TEXT_TEXT)
+
+TRACE_FLAG = 'N'
+L_PERSON_ID = 0
+i = 1
+PHN_TYP = 'X'
+
+
+E_PERSON_ID = DATA_ELEMENTS['Person_ID']
+L_PERSON_ID = TO_NUMBER(E_PERSON_ID)
+
+IF DATA_ELEMENTS.exists('Primary_Phone_ID') THEN 
+(
+E_PHONE_ID = DATA_ELEMENTS['Primary_Phone_ID']
+L_PHONE_ID = TO_NUMBER(E_PHONE_ID)
+)
+
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' AXE_HR_PRIMARY_PHN_RULE_FF - Starts' ))
+
+L_COUNTER = PER_EXT_HIST_PHONE_ID.LAST(-1) 
+
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' Person ID is '||E_PERSON_ID ||' Primary Phone ID '||E_PHONE_ID))
+
+CHANGE_CONTEXTS(PERSON_ID = L_PERSON_ID)
+(
+	WHILE (PER_EXT_HIST_PHONE_ID.EXISTS(L_COUNTER)) LOOP
+	(
+	   IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' Inside While Loop '))
+	   IF (PER_EXT_HIST_PHONE_ID[L_COUNTER] = L_PHONE_ID) 
+	   THEN
+	   (
+		 PHN_TYP = PER_EXT_HIST_PHONE_TYPE[L_COUNTER]
+		 IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' Phone Type is '||PHN_TYP))
+	   EXIT
+	   )
+	 L_COUNTER = PER_EXT_HIST_PHONE_ID.PRIOR(L_COUNTER, -1) 
+	)
+)
+
+RULE_VALUE = PHN_TYP
+
+
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' Primary Phone Type '|| RULE_VALUE ))
+
+RETURN RULE_VALUE  
+
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' AXE_HR_PRIMARY_PHN_RULE_FF - Ends' ))"

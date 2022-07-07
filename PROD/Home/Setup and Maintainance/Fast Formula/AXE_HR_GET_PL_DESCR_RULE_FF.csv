@@ -1,0 +1,37 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000036915637,"
+/* ******************************************************************
+ * Formula Name     : AXE_HR_GET_PL_DESCR_RULE_FF
+ * Formula Type     : Extract Rule
+ * Description      : Returns the P&L Location Name from UDT
+ *
+ * Change History
+ * --------------
+ *
+ * Name 	                               Ver      Date         Description
+ *-----------------------------------     ------   ------------ ------------
+   Abu Thahir                             1.0	   2019-May-15  Initial Draft
+************************************************************************** */
+
+
+DEFAULT FOR DATA_ELEMENTS IS EMPTY_TEXT_TEXT
+
+INPUTS ARE DATA_ELEMENTS (TEXT_TEXT)
+
+TRACE_FLAG = 'N'
+S_CURR_DEPT_ID='NODATA'
+
+IF (DATA_ELEMENTS.EXISTS('Dept_ID')) THEN
+(
+S_CURR_DEPT_ID=DATA_ELEMENTS['Dept_ID']
+
+	IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE('DeptID (Attribute3) : '||S_CURR_DEPT_ID ))
+
+	RULE_VALUE = GET_TABLE_VALUE('AXE_HCM_PL_LOCATION_MATRIX_UDT','PS_PL_LOCATION_NAME',S_CURR_DEPT_ID,' ') 
+
+	IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE('PL Location Name : '||RULE_VALUE))
+
+RETURN RULE_VALUE
+)
+ 
+ "

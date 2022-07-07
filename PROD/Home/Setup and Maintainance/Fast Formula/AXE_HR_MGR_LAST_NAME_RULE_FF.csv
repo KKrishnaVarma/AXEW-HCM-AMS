@@ -1,0 +1,37 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000036915642,"
+/* ******************************************************************
+ * Formula Name     : AXE_HR_MGR_LAST_NAME_FF
+ * Rice ID          : HCM_I032
+ * Formula Type     : Extract Rule
+ * Description      : To determine the level2 manager Last Name. 
+ *                    
+ *
+ * Change History
+ * --------------
+ *
+ * Name 	                               Ver      Date         Description
+ *-----------------------------------     ------   ------------ ------------
+   Srinivas Thurakapalli                   1.0	   2019-Jul-02  Initial Draft
+***************************************************************************** */
+
+DEFAULT FOR PER_ASG_MGR_MANAGER_ASG_ID IS 0
+DEFAULT FOR PER_ASG_MGR_LAST_NAME IS 'NO DATA'
+
+TRACE_FLAG = 'N' 
+
+CHANGE_CONTEXTS(HR_ASSIGNMENT_ID = PER_ASG_MGR_MANAGER_ASG_ID) 
+	(
+	
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' HR_ASSIGNMENT_ID = '|| TO_CHAR(PER_ASG_MGR_MANAGER_ASG_ID)))
+		
+	L_MGR_LAST_NAME  = PER_ASG_MGR_LAST_NAME
+) 
+IF L_MGR_LAST_NAME = 'NO DATA' THEN
+(L_MGR_LAST_NAME = ' ')
+ 
+RULE_VALUE = L_MGR_LAST_NAME
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' RULE_VALUE = '|| RULE_VALUE))
+RETURN RULE_VALUE
+ 
+"

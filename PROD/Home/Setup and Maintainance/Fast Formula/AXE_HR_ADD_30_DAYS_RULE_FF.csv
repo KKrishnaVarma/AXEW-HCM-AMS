@@ -1,0 +1,44 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000036915668,"
+/* ******************************************************************
+ * Formula Name     : AXE_HR_ADD_30_DAYS_RULE_FF
+ * Formula Type     : Extract Rule
+ * Description      : Adds 30 days to the input date value.
+ *
+ * Change History
+ * --------------
+ *
+ * Name 	                          Ver      Date          Description
+ *-------------------------------     ------   ------------ ------------
+   Abu Thahir			              1.0	   2019-Dec-17  Initial Draft
+************************************************************************** */
+
+DEFAULT FOR DATA_ELEMENTS IS EMPTY_TEXT_TEXT
+
+INPUTS ARE DATA_ELEMENTS (TEXT_TEXT)
+
+TRACE_FLAG = 'N'
+RULE_VALUE = ' '
+L_LATEST_HIRE_DATE = '1902/01/01 00:00:00' (date)
+X_LATEST_HIRE_DATE = '1902/01/01 00:00:00' (date)
+
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE('AXE_HR_ADD_30_DAYS_RULE_FF - Starts' ))
+
+IF DATA_ELEMENTS.EXISTS('Latest_Hire_Date') THEN
+(
+
+S_LATEST_HIRE_DATE = DATA_ELEMENTS['Latest_Hire_Date']
+L_LATEST_HIRE_DATE = TO_DATE(Substr(S_LATEST_HIRE_DATE,1,10),'YYYY/MM/DD')
+
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' L_LATEST_HIRE_DATE: '||TO_CHAR(L_LATEST_HIRE_DATE,'YYYY/MM/DD')))
+
+X_LATEST_HIRE_DATE = ADD_DAYS(L_LATEST_HIRE_DATE,30)
+
+RULE_VALUE = TO_CHAR(X_LATEST_HIRE_DATE,'YYYYMMDD')
+
+)
+
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' RULE_VALUE: '||RULE_VALUE ))
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE('AXE_HR_ADD_30_DAYS_RULE_FF - Ends' ))
+
+RETURN RULE_VALUE"

@@ -1,0 +1,66 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000036915599,"
+/******************************************************************************
+FORMULA NAME : AXE_HR_DESJ_EMPL_STATUS_HEADER_FF
+FORMULA TYPE : Extract Rule
+DESCRIPTION  : Derives Employee status
+********************************************************************************
+Change History:
+Name                      Ver    Date           Description
+-------------            -----   -----------     --------------------------------------------
+Srinivas Thurakapalli  	 1.0     27-MAY-2019    Initial Version
+********************************************************************************/
+
+DEFAULT FOR DATA_ELEMENTS IS EMPTY_TEXT_TEXT
+INPUTS ARE DATA_ELEMENTS      (TEXT_TEXT)
+
+rule_value=' '
+l_empl_status = ' '
+ 
+l_union = ' '
+l_pay_group = ' '
+l_work_province = ' '
+l_legal_emp = ' '
+l_start_date= ' '
+l_start_date_dt ='1900-01-01T00:00:00.000Z' (DATE)
+l_end_date_dt ='1900-01-01T00:00:00.000Z' (DATE) 
+l_end_date = ' '
+l_assgn_sts_type= ' '
+l_assgn_sts_code = ' '
+l_action_code = ' ' 
+
+
+
+
+IF(DATA_ELEMENTS.EXISTS('Assignment_Status_Type')) THEN 
+(l_assgn_sts_type=DATA_ELEMENTS['Assignment_Status_Type'])
+
+
+IF(DATA_ELEMENTS.EXISTS('Assignment_Status_Code')) THEN 
+(l_assgn_sts_code=DATA_ELEMENTS['Assignment_Status_Code'])
+
+
+IF(DATA_ELEMENTS.EXISTS('Action_Code')) THEN 
+(l_action_code=DATA_ELEMENTS['Action_Code'])
+
+
+
+l_effective_date=GET_CONTEXT(EFFECTIVE_DATE, '4712-12-31T00:00:00.000Z' (DATE))
+
+
+(
+IF (l_assgn_sts_type = 'ACTIVE' OR (l_assgn_sts_type ='SUSPENDED' AND l_assgn_sts_code<>'AXE_SUSPEND_LAYOFF')) THEN
+(l_empl_status = '01')
+ IF (l_assgn_sts_type = 'SUSPENDED'AND l_assgn_sts_code='AXE_SUSPEND_LAYOFF') THEN 
+(l_empl_status = '13')
+ IF (l_assgn_sts_type = 'INACTIVE'AND l_action_code='DEATH' ) THEN 
+(l_empl_status = '08')
+ IF (l_assgn_sts_type = 'INACTIVE'AND l_action_code<>'DEATH' ) THEN 
+(l_empl_status = '02')
+)
+
+
+
+rule_value = l_empl_status
+
+RETURN rule_value"

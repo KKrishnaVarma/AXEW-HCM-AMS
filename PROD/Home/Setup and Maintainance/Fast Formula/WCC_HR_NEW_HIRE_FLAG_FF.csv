@@ -1,0 +1,35 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000171806311,"
+/***************************************************************************************************
+Formula Name: WCC_HR_NEW_HIRE_FLAG_FF
+Formula Type: Extract Rule
+Description : Identifies if Employee is a New Hire
+
+Org/Developer                         Date         		Comments
+----------------------------------------------------------------------------------------------------
+Deloitte/Karthikeya Andey	       	22/02/2021   	Initial version
+***************************************************************************************************/
+DEFAULT FOR PER_ASG_REL_DATE_START IS '0001/01/01 00:00:00' (date)
+DEFAULT FOR PER_ASG_ASSIGNMENT_ID IS -1
+DEFAULT FOR PER_ASG_ACTION_CODE IS ' '
+
+l_assignment_id        = PER_ASG_ASSIGNMENT_ID
+l_latest_hire_date	   = PER_ASG_REL_DATE_START
+
+l_action_code          = ' '
+l_new_hire_flag 	   = 'N'
+
+CHANGE_CONTEXTS(HR_ASSIGNMENT_ID = l_assignment_id, EFFECTIVE_DATE = l_latest_hire_date)
+(
+	l_action_code = PER_ASG_ACTION_CODE
+	
+	IF(l_action_code = 'HIRE') THEN
+	(
+		l_new_hire_flag = 'Y'
+	)
+	
+)
+
+rule_value = l_new_hire_flag
+
+RETURN rule_value"

@@ -1,0 +1,36 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000266700402,"
+/* ******************************************************************
+ * Formula Name     : AXEW_HR_WESCO_LE_IDENTIFIER_FF
+ * Formula Type     : Extract Rule
+ * Description      : Returns the Legal Entity Identifier for WESCO Employees
+ *
+ * Change History
+ * --------------
+ *
+ * Name 	                               Ver      Date         Description
+ *-----------------------------------     ------   ------------ ------------
+   Manish Chauhan                         1.0	   04-Jan-2022  Initial Draft
+************************************************************************** */
+
+
+DEFAULT FOR DATA_ELEMENTS IS EMPTY_TEXT_TEXT
+
+INPUTS ARE DATA_ELEMENTS (TEXT_TEXT)
+
+TRACE_FLAG = 'N'
+S_LE_NAME = ' '
+RULE_VALUE = ' '
+
+IF (DATA_ELEMENTS.EXISTS('Legal_Entity')) THEN
+(
+	S_LE_NAME = DATA_ELEMENTS['Legal_Entity']
+
+	IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE('Legal_Entity : '||S_LE_NAME))
+	
+    RULE_VALUE = GET_VALUE_SET('AXEW_HR_LE_IDENTIFIER_VS','|=Legal_Entity='''||S_LE_NAME||'''')	
+	
+	IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' Legal Entity Identifier : '||RULE_VALUE ))
+
+	RETURN RULE_VALUE
+) "

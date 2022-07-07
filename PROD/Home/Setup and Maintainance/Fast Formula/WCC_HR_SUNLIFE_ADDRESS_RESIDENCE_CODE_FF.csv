@@ -1,0 +1,45 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000171806304,"
+/***************************************************************************************************
+Formula Name: WCC_HR_SUNLIFE_ADDRESS_RESIDENCE_CODE_FF
+Formula Type: Extract Rule
+Description : Extract Rule to fetch Address Province Code Lookup Mapping Value
+Org/Developer                         Date         		Comments
+----------------------------------------------------------------------------------------------------
+Deloitte/Karthikeya Andey	       	4/24/2021   		Initial version
+***************************************************************************************************/
+DEFAULT FOR DATA_ELEMENTS IS EMPTY_TEXT_TEXT
+
+INPUTS ARE DATA_ELEMENTS (TEXT_TEXT)
+
+l_rule_value	= ' '
+l_region3	= ' '
+l_region2	= ' '
+l_code		= ' '
+
+	IF(DATA_ELEMENTS.EXISTS('Region3')) THEN
+	(
+		l_region3		= DATA_ELEMENTS['Region3']
+		l_code			= GET_LOOKUP_MEANING('WCC_HR_RESIDENCE_CODE_SUNL_LKP', l_region3)
+		l_rule_value	= SUBSTR(l_code,1,INSTR(l_code, '-', 1, 1)-1)
+	)
+
+	IF l_rule_value||'abc' = 'abc' THEN
+	(
+		IF (DATA_ELEMENTS.EXISTS('Region2')) THEN
+		(
+			l_region2		= DATA_ELEMENTS['Region2']
+			l_code			= GET_LOOKUP_MEANING('WCC_HR_RESIDENCE_CODE_SUNL_LKP', l_region2)
+			l_rule_value	= SUBSTR(l_code,1,INSTR(l_code, '-', 1, 1)-1)
+		)
+	)
+	
+	IF l_rule_value||'abc' = 'abc' THEN
+	(
+	    l_rule_value = '65'
+	)
+
+rule_value = TRIM(l_rule_value)
+
+RETURN rule_value
+"

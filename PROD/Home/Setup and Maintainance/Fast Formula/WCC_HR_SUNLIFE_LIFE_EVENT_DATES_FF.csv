@@ -1,0 +1,20 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000171806299,"
+/***************************************************************************************************
+Formula Name: WCC_HR_SUNLIFE_LIFE_EVENT_DATES_FF
+Formula Type: Extract Rule
+Description : Fast formula to populate sunlife interface life event dates
+Org/Developer                         Date         		Comments
+----------------------------------------------------------------------------------------------------
+Deloitte/Karthikeya Andey	       	04/24/2021   	Initial version
+***************************************************************************************************/
+
+l_effective_date 	= TRUNC(GET_CONTEXT(EFFECTIVE_DATE, '0001/01/01 00:00:00'(date)))
+l_effective_date_ch	= TO_CHAR(l_effective_date)
+
+l_life_event_begin_date	= TO_CHAR(ADD_DAYS(l_effective_date, 1), 'YYYY-MM-DD')
+l_life_event_end_date	= TO_CHAR(ADD_DAYS(l_effective_date,31), 'YYYY-MM-DD')
+
+rule_value = l_life_event_begin_date||'|'||l_life_event_end_date
+
+RETURN rule_value"

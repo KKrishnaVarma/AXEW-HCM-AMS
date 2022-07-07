@@ -1,0 +1,51 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000036915636,"
+/* ******************************************************************
+ * Formula Name     : AXE_HR_PERSON_NUMBER_RULE_FF
+ * Rice ID          : HCM_I030,HCM_I032
+ * Formula Type     : Extract Rule
+ * Description      : To get the Person Number of an employee  
+ *
+ * Change History
+ * --------------
+ *
+ * Name 	                               Ver      Date         Description
+ *-----------------------------------     ------   ------------ ------------
+   Abu Thahir                             1.0	   2019-Jun-11  Initial Draft
+***************************************************************************** */
+
+
+
+DEFAULT FOR DATA_ELEMENTS IS EMPTY_TEXT_TEXT
+DEFAULT FOR PER_PER_PERSON_NUMBER IS 'NO DATA'
+
+
+INPUTS ARE DATA_ELEMENTS (TEXT_TEXT)
+
+TRACE_FLAG = 'N'
+L_PERSON_ID = 0
+L_PERSON_NUMBER = 'NO DATA'
+
+E_PERSON_ID = DATA_ELEMENTS['Person_ID']
+L_PERSON_ID = TO_NUMBER(E_PERSON_ID)
+
+
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' Person ID is '||E_PERSON_ID ))
+
+CHANGE_CONTEXTS(PERSON_ID = L_PERSON_ID)
+(
+L_PERSON_NUMBER = PER_PER_PERSON_NUMBER
+)
+
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' Person Number is '|| L_PERSON_NUMBER ))
+
+IF L_PERSON_NUMBER = 'NO DATA' THEN
+	(
+	RULE_VALUE = ' '
+	)
+ELSE
+	(
+	RULE_VALUE = L_PERSON_NUMBER
+	)
+
+RETURN RULE_VALUE "

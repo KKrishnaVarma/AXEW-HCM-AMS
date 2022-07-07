@@ -1,0 +1,62 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000036915659,"
+/* ******************************************************************
+ * Formula Name     : AXE_HR_USER_STATUS_RULE_FF
+ * Formula Type     : Extract Rule
+ * Description      : Returns Person Hire Status .
+ *
+ * Change History
+ * --------------
+ *
+ * Name 	                          Ver      Date          Description
+ *-----------------------------------     ------   ------------ ------------
+   Srinivas Thurakapalli              1.0	   2019-Nov-21  Initial Draft
+   Abu Thahir						  1.1      2019-Dec-06  Logic Modified
+************************************************************************** */
+
+
+DEFAULT FOR DATA_ELEMENTS IS EMPTY_TEXT_TEXT
+
+INPUTS ARE DATA_ELEMENTS (TEXT_TEXT)
+
+TRACE_FLAG = 'N'
+
+RULE_VALUE = ' '
+L_ASGN_STATUS_CODE = ' '
+S_HIRE_STATUS = '8'
+L_HR_STATUS = ' '
+L_HIRE_STATUS = '8'
+L_DEPT_CODE ='X'
+
+IF DATA_ELEMENTS.EXISTS('Assignment_Status_Code') THEN
+(
+	L_ASGN_STATUS_CODE = DATA_ELEMENTS['Assignment_Status_Code']
+	IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE('Assignment Status Code: '||L_ASGN_STATUS_CODE))
+
+	S_HIRE_STATUS = GET_LOOKUP_MEANING('AXE_HR_USER_STATUS_LKP',L_ASGN_STATUS_CODE)
+	L_HIRE_STATUS = SUBSTR(S_HIRE_STATUS,1,1) 
+)
+
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' Lookup Returns: '|| S_HIRE_STATUS || ' * ' ||L_HIRE_STATUS ))
+
+IF (ISNULL(S_HIRE_STATUS)='N') THEN
+(
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' Pick HR Status'))
+
+IF DATA_ELEMENTS.EXISTS('Assignment_Status_Type') THEN 
+(
+	L_HR_STATUS = DATA_ELEMENTS['Assignment_Status_Type']
+	IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' Assignment_Status_Type: '||L_HR_STATUS))
+
+	IF L_HR_STATUS = 'ACTIVE' THEN (L_HIRE_STATUS = 'A')
+	IF L_HR_STATUS = 'INACTIVE' THEN (L_HIRE_STATUS = 'T')
+	IF L_HR_STATUS = 'SUSPENDED' THEN (L_HIRE_STATUS = 'L')
+)
+)
+
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' Hire Status: '||L_HIRE_STATUS ))
+
+RULE_VALUE = L_HIRE_STATUS
+
+RETURN RULE_VALUE
+"

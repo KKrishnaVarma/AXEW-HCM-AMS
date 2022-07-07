@@ -1,0 +1,45 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000036915656,"
+/* ******************************************************************
+ * Formula Name     : AXE_HR_SITE_NAME_RULE_FF
+ * Formula Type     : Extract Rule
+ * Description      : Returns Legacy Site name 
+ *
+ * Change History
+ * --------------
+ *
+ * Name 	                               Ver      Date         Description
+ *-----------------------------------     ------   ------------ ------------
+   Srinivas Thurakapalli                  1.0	   2019-Oct-24  Initial Draft
+***************************************************************************** */
+
+
+DEFAULT FOR DATA_ELEMENTS IS EMPTY_TEXT_TEXT
+
+INPUTS ARE DATA_ELEMENTS (TEXT_TEXT)
+
+TRACE_FLAG = 'N'
+RULE_VALUE = 'X'
+
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' AXE_HR_ORIGINAL_HIRE_DT_RULE_FF - Starts' ))
+
+IF DATA_ELEMENTS.EXISTS('Site') THEN
+(
+L_SITE_CODE = DATA_ELEMENTS['Site']
+
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE('Site Code: '||L_SITE_CODE))
+
+RULE_VALUE = GET_VALUE_SET('AXE_SITE_VS','|=P_FLEX_VALUE='''||L_SITE_CODE||'''') 
+         
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' Site Name : '||RULE_VALUE ))
+)
+
+IF RULE_VALUE = 'X' THEN
+(
+RULE_VALUE = ' '
+)
+
+
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' AXE_HR_ORIGINAL_HIRE_DT_RULE_FF - Ends' ))
+
+RETURN RULE_VALUE"

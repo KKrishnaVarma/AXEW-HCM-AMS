@@ -1,0 +1,65 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000321096426,"
+
+/************************************************************
+Description : Formula to calculate pro rated amounts.
+
+DISCLAIMER : This formula is strictly for example or prototype
+ purposes only. You should update the formula to meet your particular
+ requirements. This formula may contain certain hard
+ coded values to simplify the use of formulas for proration. A typical example
+ of proration would be when a new employee starts work in the middle of a
+ monthly payroll period and your payroll department makes a pro-rata payment
+ to reflect the proportion of monthly pay to which the employee is entitled.
+ The prototype formula supplied is only designed to work for payroll
+ calculations involving proration and should not be used for any other purpose.
+ Any use of the formula is subject to the terms of the Oracle license agreement
+ for the HRMS programs and documentation.
+
+*************************************************************/
+
+/* Database Item Defaults */
+default for prorate_start is '0001/01/01 00:00:00' (date)
+default for prorate_end is '0001/01/01 00:00:00' (date)
+default for PAY_EARN_PERIOD_START is '0001/01/01 00:00:00' (date)
+default for PAY_EARN_PERIOD_END is '0001/01/01 00:00:00' (date)
+
+default for pay_value is 0.0
+default for hours_worked is 0.0
+
+inputs are  prorate_start (date),
+            prorate_end (date),
+            pay_value (number),
+            hours_worked (number)
+            
+l_log = PAY_INTERNAL_LOG_WRITE('(GLBEBSC)Entered the Proration Formula')
+l_hours = 0.0           
+l_value = pay_value
+l_total_days = days_between(PAY_EARN_PERIOD_END, PAY_EARN_PERIOD_START ) + 1
+
+  l_log = PAY_INTERNAL_LOG_WRITE('(GLBPRT) Initial hours : '||TO_CHAR(hours_worked))  
+  l_log = PAY_INTERNAL_LOG_WRITE('(GLBPRT) Initial PAY_VALUE : '||TO_CHAR(PAY_VALUE))
+
+IF (prorate_start was defaulted) then
+(
+    l_days = l_total_days
+)
+else
+(
+     l_log = PAY_INTERNAL_LOG_WRITE('(GLBEBSC) Porate start date found : '||to_char(prorate_start))
+     l_days = days_between(prorate_end , prorate_start) + 1
+
+)
+    l_value = (l_value / l_total_days) * l_days
+    l_hours = (l_days / l_total_days) * hours_worked   /** will be replaced by Get_pay_availibility **/ 
+
+    l_log = PAY_INTERNAL_LOG_WRITE('(GLBEBSC) calculated pay_value : '||TO_CHAR(l_value))
+    l_log = PAY_INTERNAL_LOG_WRITE('(GLBEBSC) l_total_days : '||TO_CHAR(l_total_days))
+    l_log = PAY_INTERNAL_LOG_WRITE('(GLBEBSC) calculated days : '||TO_CHAR(l_days))
+    l_log = PAY_INTERNAL_LOG_WRITE('(GLBEBSC) calculated hours : '||TO_CHAR(l_hours))
+               
+               pay_value = l_value
+               hours_worked = ROUND(l_hours,2)
+               
+return pay_value, hours_worked
+"

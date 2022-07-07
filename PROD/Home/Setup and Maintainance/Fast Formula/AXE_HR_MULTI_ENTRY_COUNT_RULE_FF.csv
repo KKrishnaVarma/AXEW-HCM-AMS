@@ -1,0 +1,38 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000036915588,"
+/* ******************************************************************
+ * Formula Name     : AXE_HR_ELEEMNT_ENTRY_SEQ_RULE_FF
+ * Formula Type     : Extract Rule
+ * Description      : Returns the Payroll Reporting Name.
+ *
+ * Change History
+ * --------------
+ *
+ * Name 	                          Ver      Date          Description
+ *-----------------------------------     ------   ------------ ------------
+   Srinivas Thurakapalli              1.0	  2019-Aug-22  Initial Draft
+************************************************************************** */
+
+
+DEFAULT FOR DATA_ELEMENTS IS EMPTY_TEXT_TEXT
+
+INPUTS ARE DATA_ELEMENTS (TEXT_TEXT)
+
+TRACE_FLAG = 'N'
+RULE_VALUE = 'X'
+
+IF DATA_ELEMENTS.EXISTS('Element_Entry_ID') THEN
+(
+L_ENTRY_ID = DATA_ELEMENTS['Element_Entry_ID']
+
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE('Element Entry ID : '||L_ENTRY_ID))
+
+RULE_VALUE = GET_VALUE_SET('AXE_ELEMENT_ENTRY_COUNT_VS','|=ELEMENT_ENTRY_ID='''||L_ENTRY_ID||'''') 
+           
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' Element Entry Value ID: '||RULE_VALUE ))
+)
+IF RULE_VALUE ='X' THEN
+(
+RULE_VALUE = ' '
+)
+RETURN RULE_VALUE"

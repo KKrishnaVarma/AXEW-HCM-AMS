@@ -1,0 +1,41 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000093869490,"
+/* ******************************************************************
+ * Formula Name     : AXE_HR_HIRE_DT_SAL_FF
+ * Formula Type     : Extract Rule
+ * Description      : Returns Employee Salary on Hire Date
+ *
+ * Change History
+ * --------------
+ *
+ * Name 	                          Ver      Date              Description
+ *-----------------------------------     ------   ------------ ------------
+   Manish                            1.0	   2021-March-31    Initial Draft
+************************************************************************** */
+
+
+DEFAULT FOR DATA_ELEMENTS IS EMPTY_TEXT_TEXT
+
+INPUTS ARE DATA_ELEMENTS (TEXT_TEXT)
+
+TRACE_FLAG = 'N'
+RULE_VALUE = 'X'
+LC_ASSIGNMENT_ID = 0
+E_LATEST_HIRE_DATE = ' '
+L_LATEST_HIRE_DT = '1905/01/01 00:00:00' (date)
+RULE_VALUE = ' '
+
+IF DATA_ELEMENTS.EXISTS('Assignment_ID') AND DATA_ELEMENTS.EXISTS('Latest_Hire_Date')
+THEN 
+(
+LC_ASSIGNMENT_ID = TO_NUMBER(DATA_ELEMENTS['Assignment_ID'])
+E_LATEST_HIRE_DATE = DATA_ELEMENTS['Latest_Hire_Date']
+L_LATEST_HIRE_DT =  TO_DATE(SUBSTR(E_LATEST_HIRE_DATE,1,10),'YYYY/MM/DD')
+
+LC_HIRE_SAL = GET_VALUE_SET('AXE_HR_SAL_HIRE_DATE' ,'|=ASSIGNMENT_ID='''||TO_CHAR(LC_ASSIGNMENT_ID)||''''||'|HIRE_DATE='||to_char(L_LATEST_HIRE_DT,'YYYY-MM-DD')||'''') 
+RULE_VALUE = LC_HIRE_SAL
+           
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' Hire Salary : '||RULE_VALUE ))
+)
+
+RETURN RULE_VALUE"

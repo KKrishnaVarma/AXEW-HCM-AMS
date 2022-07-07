@@ -1,0 +1,33 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000171806312,"
+/***************************************************************************************************
+Formula Name: WCC_HR_PERSON_NUMBER_FF
+Formula Type: Extract Rule
+Description : Fetches Person Number based on Person ID
+Org/Developer                         Date         		Comments
+----------------------------------------------------------------------------------------------------
+Deloitte/Shruti Krishnan	       	4/30/2021   	Initial version
+***************************************************************************************************/
+DEFAULT FOR PER_PER_PERSON_NUMBER IS ' '
+DEFAULT FOR DATA_ELEMENTS IS EMPTY_TEXT_TEXT
+
+INPUTS ARE DATA_ELEMENTS (TEXT_TEXT)
+
+l_person_id		 = 1
+l_person_number	 = ' '
+l_effective_date = TRUNC(GET_CONTEXT(EFFECTIVE_DATE, '0001/01/01 00:00:00'(date)))
+
+
+IF(DATA_ELEMENTS.EXISTS('Person_Id')) THEN
+(
+	l_person_id = TO_NUMBER(DATA_ELEMENTS['Person_Id'])
+	CHANGE_CONTEXTS(PERSON_ID = l_person_id, EFFECTIVE_DATE = l_effective_date)
+    (
+		l_person_number = PER_PER_PERSON_NUMBER
+    )	
+)
+
+RULE_VALUE = TRIM(l_person_number)
+
+RETURN RULE_VALUE 
+ "

@@ -1,0 +1,57 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000065440290,"
+/* ******************************************************************
+ * Formula Name     : AXE_DESJARDINS_USER_GET_REHIRE_DATE_FF
+ * INCEDENT Number  : INC0386633 
+ * Formula Type     : Extract Rule
+ * Description      : Check PPOS-TOS action and fetch the previous ASGN Rehire date
+ *
+ * Change History
+ * --------------
+ *
+ * Name 	                               Ver      Date         Description
+ *-----------------------------------     ------   ------------ ------------
+   Vibha Sorte                             1.0	   10-Aug-2020   Initial Draft
+***************************************************************************** */
+
+
+DEFAULT FOR DATA_ELEMENTS IS EMPTY_TEXT_TEXT
+
+INPUTS ARE DATA_ELEMENTS (TEXT_TEXT)
+
+TRACE_FLAG = 'N'
+PPOS_TOS_ACTION = 'XX'
+PPOS_TOS_GLB = 'N'
+REHIRE_DT = 'YY'
+RULE_VALUE = 'X'
+
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' AXE_DESJARDINS_USER_GET_REHIRE_DATE - Starts' ))
+
+IF DATA_ELEMENTS.EXISTS('Person_ID') THEN
+(
+	E_PERSON_ID = DATA_ELEMENTS['Person_ID']
+
+	IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE('Person Id : '||E_PERSON_ID))
+
+	PPOS_TOS_ACTION = GET_VALUE_SET('AXE_DESJARDINS_USER_TOS_PPOS_ACTION_CODE_VS','|=PERSON_ID='''||E_PERSON_ID||'''') 
+         
+	IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' PPOS_TOS_ACTION  : '||PPOS_TOS_ACTION ))
+	IF PPOS_TOS_ACTION = 'GLB_TRANSFER' THEN 
+	(
+		REHIRE_DT= GET_VALUE_SET('AXE_DESJARDINS_USER_GET_REHIRE_DATE_VS','|=PERSON_ID='''||E_PERSON_ID||'''') 
+
+		IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' REHIRE_DT  : '||REHIRE_DT ))
+		PPOS_TOS_GLB = 'Y'
+		RULE_VALUE = PPOS_TOS_GLB || REHIRE_DT
+	)
+)
+
+IF RULE_VALUE = 'X' THEN
+(
+RULE_VALUE = ' '
+)
+
+
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' AXE_DESJARDINS_USER_GET_REHIRE_DATE - Ends' ))
+
+RETURN RULE_VALUE"

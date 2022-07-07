@@ -1,0 +1,38 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000171806278,"
+/***************************************************************************************************
+Formula Name: WCC_HR_PAYROLL_REPORTING_NAME_FF
+Formula Type: Extract Rule
+Description : Fetches Payroll Reporting Name for Terminated Employees
+
+Org/Developer                         Date         		Comments
+----------------------------------------------------------------------------------------------------
+Deloitte/Karthikeya Andey	       	03/01/2021   	Initial version
+***************************************************************************************************/
+DEFAULT FOR PER_ASG_EFFECTIVE_START_DATE IS '0001/01/01 00:00:00' (date)
+DEFAULT FOR PER_ASG_EFFECTIVE_END_DATE IS '0001/01/01 00:00:00' (date)
+DEFAULT FOR PER_ASG_REL_DATE_START IS '0001/01/01 00:00:00' (date)
+DEFAULT FOR PER_REL_ACTUAL_TERMINATION_DATE IS '0001/01/01 00:00:00' (date)
+DEFAULT FOR PER_ASG_ASSIGNMENT_ID IS -1
+DEFAULT FOR PAYROLL_NAME IS ' '
+DEFAULT FOR PAYROLL_REPORTING_NAME IS ' '
+
+l_person_id				= GET_CONTEXT(PERSON_ID,1)
+l_hr_term_id			= GET_CONTEXT(HR_TERM_ID,1)
+l_hr_term_id_ch			= TO_CHAR(l_hr_term_id)
+l_assignment_id			= PER_ASG_ASSIGNMENT_ID
+l_latest_hire_date		= PER_ASG_REL_DATE_START
+l_termination_date		= PER_REL_ACTUAL_TERMINATION_DATE
+l_effective_date_ch		= TO_CHAR(l_termination_date)
+
+l_payroll_reporting_name	= ' '
+
+l_payroll_reporting_name	= GET_VALUE_SET('WCC_HR_PAYROLL_REPORTING_NAME_VS', '|=TERM_ID='
+								||l_hr_term_id_ch
+								||'|EFF_DATE='
+								||l_effective_date_ch
+								||'|')
+
+rule_value = TRIM(l_payroll_reporting_name)
+
+RETURN rule_value"

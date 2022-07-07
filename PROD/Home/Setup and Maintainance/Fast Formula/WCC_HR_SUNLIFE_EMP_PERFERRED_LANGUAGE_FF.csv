@@ -1,0 +1,33 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000171806306,"
+/***************************************************************************************************
+Formula Name: WCC_HR_SUNLIFE_EMP_PERFERRED_LANGUAGE_FF
+Formula Type: Extract Rule
+Description : Fast Formula to fetch Employee user profile preferred language
+Extract Name: 
+Org/Developer                         Date         		Comments
+----------------------------------------------------------------------------------------------------
+Deloitte/Karthikeya Andey	       	4/26/2021   		Initial version
+***************************************************************************************************/
+l_rule_value			= ' '
+l_preferred_language 	= ' '
+l_person_id         	= GET_CONTEXT(PERSON_ID,1)
+l_person_id_ch      	= TO_CHAR(l_person_id)
+
+l_preferred_language 	= GET_VALUE_SET('WCC_HR_EMP_PERFERRED_LANGUAGE_VS', '|=P_PERSON_ID='
+								||l_person_id_ch
+								||'|')
+
+IF (l_preferred_language = 'fr-CA' OR l_preferred_language = 'fr')
+	THEN
+	(
+		l_rule_value = 'F'
+	)
+	ELSE
+	(
+		l_rule_value = 'E'
+	)
+
+rule_value = TRIM(l_rule_value)				
+
+RETURN rule_value"

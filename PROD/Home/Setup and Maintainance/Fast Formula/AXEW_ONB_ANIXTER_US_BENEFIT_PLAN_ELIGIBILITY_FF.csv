@@ -1,0 +1,23 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000159808213,"
+/*************************************************************************************
+Formula Name:  AXEW_ONB_ANIXTER_US_BENEFIT_PLAN_ELIGIBILITY_FF
+FORMULA TYPE:  Participation And Rate Eligibility
+DESCRIPTION:   Returns Y if candidate is non-union and Full time employee 
+Org/Developer                         Date         		Comments
+----------------------------------------------------------------------------------------------------
+Deloitte/Karthikeya Andey	    6/22/2021   	Initial version
+***************************************************************************************************/
+DEFAULT FOR PER_ASG_FULL_PART_TIME IS ' '
+DEFAULT FOR PER_ASG_UNION_NAME IS ' '
+
+ELIGIBLE	= 'N'
+
+
+IF PER_ASG_FULL_PART_TIME WAS NOT DEFAULTED AND PER_ASG_FULL_PART_TIME = 'FULL_TIME'
+   AND (PER_ASG_UNION_NAME WAS DEFAULTED OR PER_ASG_UNION_NAME = ' ')  THEN
+(
+  ELIGIBLE = 'Y'
+)
+
+RETURN ELIGIBLE"

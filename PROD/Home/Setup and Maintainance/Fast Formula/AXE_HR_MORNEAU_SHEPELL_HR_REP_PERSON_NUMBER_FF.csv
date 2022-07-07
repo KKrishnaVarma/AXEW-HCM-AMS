@@ -1,0 +1,55 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000069450374,"
+/* ******************************************************************************************************************
+ * Formula Name     : AXE_HR_MORNEAU_SHEPELL_HR_REP_PERSON_NUMBER_FF 
+ * INCEDENT Number  : INC0402233 
+ * Formula Type     : Extract Rule
+ * Description      : AXE HR Morneau Shepell fast formula to fetch HR_REP PERSON_NUMBER for INCLUDE_TOP_HIER_NODE=Y
+ * Change History
+ * --------------
+ * Name 	                               Ver      Date         Description
+ *-----------------------------------     ------   ------------ ------------
+   Vibha Sorte                             1.0	   2020-Nov-11  Initial Draft
+*******************************************************************************************************************/
+
+DEFAULT FOR DATA_ELEMENTS IS EMPTY_TEXT_TEXT
+DEFAULT FOR PER_PER_PERSON_NUMBER IS 'NO DATA'
+
+
+INPUTS ARE DATA_ELEMENTS (TEXT_TEXT)
+
+TRACE_FLAG = 'N'
+L_PERSON_ID = 0
+L_PERSON_NUMBER = 'NO DATA'
+RULE_VALUE = 'X'
+
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' AXE_HR_MORNEAU_SHEPELL_HR_REP_PERSON_NUMBER_FF - Starts' )) 
+
+IF DATA_ELEMENTS.EXISTS('AOR_HR_REP_PERSON_ID') THEN
+(
+E_PERSON_ID = DATA_ELEMENTS['AOR_HR_REP_PERSON_ID']
+L_PERSON_ID = TO_NUMBER(E_PERSON_ID)
+
+
+	IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' Person ID is '||E_PERSON_ID ))
+
+	CHANGE_CONTEXTS(PERSON_ID = L_PERSON_ID)
+	(
+	L_PERSON_NUMBER = PER_PER_PERSON_NUMBER
+	)
+    IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' Person Number is '|| L_PERSON_NUMBER ))
+    RULE_VALUE = L_PERSON_NUMBER
+)
+
+
+IF L_PERSON_NUMBER = 'NO DATA' THEN
+	(
+	RULE_VALUE = ' '
+	)
+ELSE
+	(
+	RULE_VALUE = L_PERSON_NUMBER
+	)
+
+ IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' AXE_HR_MORNEAU_SHEPELL_HR_REP_PERSON_NUMBER_FF - Ends' )) 
+RETURN RULE_VALUE"

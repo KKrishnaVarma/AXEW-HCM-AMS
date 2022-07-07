@@ -1,0 +1,40 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000171806295,"
+/***************************************************************************************************
+Formula Name: WCC_HR_BUDGET_LOCATION_CODE_FF
+Formula Type: Extract Rule
+Description: Fetches Budget Location Code Code
+Org/Developer                         Date         		Comments
+----------------------------------------------------------------------------------------------------
+Deloitte/Karthikeya Andey	       	4/22/2021   		Initial Version
+***************************************************************************************************/
+DEFAULT FOR PER_ASG_ATTRIBUTE7 IS ' '
+
+l_rule_value		= ' '
+l_budget_location	= ' '
+l_budget_code		= ' '
+
+IF PER_ASG_ATTRIBUTE7 WAS NOT DEFAULTED 
+THEN 
+(
+	l_budget_location	= PER_ASG_ATTRIBUTE7
+
+	l_budget_code		= GET_VALUE_SET('WCC_HR_DEPENDENT_VALUE_SET_DESCRIPTION_VS', '|=P_VALUE_SET_NAME='
+								||'AXEW_WESCO_BUDGET_LOCATIONS_VS'
+								||'|P_VALUE='
+								||l_budget_location
+								||'|')
+	
+	IF	l_budget_code ||'abc' = 'abc' 
+	THEN
+	(
+		l_rule_value = SUBSTR(l_budget_location,1,4)
+	)
+	ELSE
+	(
+		l_rule_value = l_budget_code
+	)
+)
+rule_value = TRIM(l_rule_value)
+
+RETURN rule_value"
