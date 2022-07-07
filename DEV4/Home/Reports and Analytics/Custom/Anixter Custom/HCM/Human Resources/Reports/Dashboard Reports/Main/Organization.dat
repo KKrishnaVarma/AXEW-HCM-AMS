@@ -1,4 +1,0 @@
-METADATA|Organization|EffectiveStartDate|EffectiveEndDate|Name|ClassificationCode|ClassificationName|OrganizationId|SourceSystemOwner|SourceSystemId
-MERGE|Organization|0001/01/01|4712/12/31|Accu-Tech Corporation|HCM_LEMP|Legal Employer|300000035885666||
-METADATA|OrgUnitClassification|EffectiveStartDate|EffectiveEndDate|OrganizatioName|ClassificationCode|ClassificationName|OrganizationId|SourceSystemOwner|SourceSystemId|OrgUnitClassificationId
-MERGE|OrgUnitClassification|0001/01/01|4712/12/31|Accu-Tech Corporation|HCM_LEMP|Legal Employer|300000035885666|||300000035885668
