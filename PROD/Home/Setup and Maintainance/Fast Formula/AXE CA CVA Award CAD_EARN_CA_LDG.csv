@@ -1,0 +1,215 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000319504437,"
+
+/*****************************************************************************
+
+FORMULA NAME: {Element Base Name}_EARN
+
+FORMULA TYPE: Payroll
+
+DESCRIPTION: 
+This is the formula for processing a flat amount earning element. The formula 
+assumes that the amounts and periodicity are available in element entries. 
+Salary and Periodicity from Oracle Fusion Compensation will also be available
+in element entries.
+
+Formula Results :
+
+ l_value               Direct Result for Earnings Pay Value.
+ l_reduce              Direct Result for Earnings Reduce Regular Earnings.
+ mesg                  Warning message will be issued for this assignment.
+
+*******************************************************************************/
+
+/* Database Item Defaults */
+
+DEFAULT FOR amount                         is 0
+DEFAULT FOR mesg                           is ' '
+DEFAULT FOR ENTRY_LEVEL       IS 'AP'
+DEFAULT FOR PAYROLL_PERIOD_TYPE IS ' '
+DEFAULT FOR PAY_EARN_PERIOD_START  is '0001/01/01 00:00:00' (date)
+DEFAULT FOR PAY_EARN_PERIOD_END is '4712/12/31 00:00:00' (date)
+DEFAULT FOR REDUCE_REGULAR_EARNINGS_ASG_RUN is 0
+DEFAULT FOR REDUCE_REGULAR_EARNINGS_REL_RUN IS 0
+DEFAULT FOR REDUCE_REGULAR_EARNINGS_TRM_RUN IS 0
+DEFAULT FOR amount_pay_source              IS ' '
+DEFAULT FOR amount_source                  IS ' '
+DEFAULT FOR ASG_HR_ASG_ID    is 0
+DEFAULT FOR TERM_HR_TERM_ID    is 0
+DEFAULT FOR pay_value is 0
+/* Inputs  */
+
+INPUTS ARE        amount (number),
+                  amount_source (text),
+                  amount_pay_source (text),
+                  periodicity (text),
+                  reduce_regular (text),
+                  pay_value(number)
+
+/* Declarations */
+
+l_log = PAY_INTERNAL_LOG_WRITE('(GLBEARN)Initializing the Flat Amount Earnings Formula')
+
+
+l_amount           = amount
+l_value            = 0
+l_reduce           = 0
+l_hours            = 0
+l_actual_amount = 0
+l_actual_start_date = '0001/01/01 00:00:00' (Date)
+l_actual_end_date = '0001/01/01 00:00:00' (Date)
+
+/*    Assigning the Reduce Regular Values to the local variables */
+
+/*    Assigning the  Values to the local variables*/
+l_actual_start_date = PAY_EARN_PERIOD_START
+l_actual_end_date = PAY_EARN_PERIOD_END
+l_secondary_classification = 'REGULAR NOT WORKED'
+l_salary_element = ' '
+l_source_periodicity = periodicity
+l_target_periodicity = PAYROLL_PERIOD_TYPE
+
+/* If pay value is already set, no further processing required for pay value */
+IF (pay_value = 0 and pay_value was defaulted ) THEN
+(
+
+
+l_log = PAY_INTERNAL_LOG_WRITE('(GLBEARN) Amount Source :'||amount_source)
+l_log = PAY_INTERNAL_LOG_WRITE('(GLBEARN) l_source_periodicity :'||l_source_periodicity)
+
+/*************************************************************************
+Get the hours worked from Core HR Work Schedule. Call to per_availability_details.get_schedule_duration 
+to get the actual number of Hours Worked
+
+               Parameters to be passed : -
+               p_resource_id => Assignment Id or Term Id
+               p_resource_type default 'ASSIGN' or TERM
+               p_period_start   Period Start
+               p_period_end     Period End
+               p_use_sch_asg  DEFAULT 'Y'
+               p_use_sch_inh   DEFAULT 'Y'
+               p_include_noshift DEFAULT 'N'
+               p_include_calevents IN CHAR DEFAULT 'Y'
+               p_calc_units        IN CHAR DEFAULT 'H'
+***********************************************************************/
+    l_log = PAY_INTERNAL_LOG_WRITE('(GLBEARN) ENTRY LEVEL IS ' ||ENTRY_LEVEL)
+    
+     l_log = PAY_INTERNAL_LOG_WRITE('(GLBEARN) GETPAY BEFORE CALL ')
+      SET_INPUT('ACTUAL_START_DATE',l_actual_start_date)
+      SET_INPUT('ACTUAL_END_DATE',l_actual_end_date)
+      SET_INPUT('UNIT_TYPE','H')
+	  SET_INPUT('ENTRY_LEVEL', entry_level)
+IF ( ENTRY_LEVEL = 'AP') THEN
+   (
+    l_term_assignment_id = TERM_HR_TERM_ID 
+    SET_INPUT('HR_ASSIGN_ID',l_term_assignment_id)      
+   )
+ELSE IF ( ENTRY_LEVEL = 'PA') THEN   (       
+       l_term_assignment_id = ASG_HR_ASG_ID
+       SET_INPUT('HR_ASSIGN_ID',l_term_assignment_id)        
+   )   
+
+      EXECUTE('GET_PAY_AVAILABILITY')
+
+     l_log = PAY_INTERNAL_LOG_WRITE('(GLBEARN) GETPAY Executed ')
+
+     l_hours = GET_OUTPUT('L_UNITS',0)
+     
+ /* Setting the inputs for Rate Convertor */
+ IF (l_source_periodicity <> 'Hourly') THEN
+ (
+    IF (l_source_periodicity = 'PRD') THEN
+     (
+        l_value = l_amount
+      )
+     else
+     ( 
+       l_log = PAY_INTERNAL_LOG_WRITE('(GLBEARN) Amount : '||TO_CHAR(l_amount))
+       l_log = PAY_INTERNAL_LOG_WRITE('(GLBEARN)Source Periodicity  : '||l_source_periodicity)
+       l_log = PAY_INTERNAL_LOG_WRITE('(GLBEARN)Target periodicity  : '||l_target_periodicity)
+  
+       l_log = PAY_INTERNAL_LOG_WRITE('(GLBEARN) Parameter Initialization for Rate Converter Call')
+  
+        SET_INPUT('SOURCE_AMOUNT',l_amount)
+        SET_INPUT('SOURCE_PERIODICITY',l_source_periodicity)
+        SET_INPUT('TARGET_PERIODICITY',l_target_periodicity)
+  
+        EXECUTE('RATE_CONVERTER')
+  
+       l_log = PAY_INTERNAL_LOG_WRITE('(GLBEARN) Rate Converter Executed ')
+  
+       l_value = GET_OUTPUT('TARGET_AMOUNT',0)
+  
+      l_log = PAY_INTERNAL_LOG_WRITE('(GLBEARN) Target amount Returned')
+      l_log = PAY_INTERNAL_LOG_WRITE('(GLBEARN) Target amount :'||TO_CHAR(l_actual_amount))
+  
+  
+      /*End of Setting Inputs for Rate Convertor*/
+    )
+ )
+ Else
+ (
+   
+    l_value =l_amount * l_hours
+
+ )
+
+)   /* for IF of pay_value = 0 */
+else
+(
+l_value = pay_value
+)
+l_log = PAY_INTERNAL_LOG_WRITE('(GLBEARN) Value : '||TO_CHAR(l_value))
+
+l_log = PAY_INTERNAL_LOG_WRITE('(GLBEARN) l_hours : '||TO_CHAR(l_hours))
+
+/* Reduce Regular */
+
+l_log = PAY_INTERNAL_LOG_WRITE('(GLBEARN) Reduce Regular Calculation Begins')
+
+
+/****************************************************************************  
+This logic will be executed when the employee's regular salary needs
+to be reduced. For example, this may happen when employee might have taken
+Vacation Pay or Sick Pay and it reduces the regular salary. 
+The regular salary element being reduced, is created via Compensation and in addition 
+it's secondary classification cannot be REGULAR_NOT_WORKED, for 
+the formula to pick up for reducing it.
+****************************************************************************/
+
+     
+ IF (l_secondary_classification <> 'REGULAR NOT WORKED') THEN
+ (
+    /* Use the appropriate balance based on the employment level for the given element.*/
+    IF ( ENTRY_LEVEL = 'PA') THEN
+     (
+       l_reduce = REDUCE_REGULAR_EARNINGS_ASG_RUN
+     )
+    ELSE IF ( ENTRY_LEVEL = 'AP') THEN
+     (
+       l_reduce = REDUCE_REGULAR_EARNINGS_TRM_RUN
+     )
+    ELSE
+     (
+       l_reduce = REDUCE_REGULAR_EARNINGS_REL_RUN
+     )
+
+ If l_reduce <= l_value then
+ (
+   l_value = l_value - l_reduce
+  )
+  Else
+  (
+    l_reduce = l_value
+    l_value = 0
+  )
+ )
+
+  l_log = PAY_INTERNAL_LOG_WRITE('(GLBEARN) Derived value : '||TO_CHAR(l_value))
+RETURN l_value          ,
+       l_hours          ,
+       l_reduce         ,
+       mesg
+
+/* End Formula Text */
+      "

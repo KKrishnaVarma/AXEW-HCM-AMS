@@ -1,0 +1,71 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000302365164,"
+/* ******************************************************************
+ * Formula Name     : AXEW_HR_LENGTH_OF_SERVICE_FF
+ * Formula Type     : Extract Rule
+ * Description      : Returns Employee Seniority Date
+ *
+ * Change History
+ * --------------
+ *
+ * Name 	                               Ver      Date         Description
+ *-----------------------------------     ------   ------------ ------------
+   Manish Chauhan                         1.0	   09-Feb-2022  Initial Draft
+************************************************************************** */
+
+
+DEFAULT FOR DATA_ELEMENTS IS EMPTY_TEXT_TEXT
+
+INPUTS ARE DATA_ELEMENTS (TEXT_TEXT)
+
+TRACE_FLAG = 'N'
+S_LE_NAME = ' '
+RULE_VALUE = ' '
+
+IF (DATA_ELEMENTS.EXISTS('Person_Id')) THEN
+(
+	L_Person_Id = DATA_ELEMENTS['Person_Id']
+
+	IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE('Person_Id : '||L_Person_Id))
+	
+    RULE_VALUE = GET_VALUE_SET('AXE_HR_SENIORITY_DATE_VS','|=Person_Id='''||L_Person_Id||'''')	
+	
+	IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' Seniority Date: '||RULE_VALUE ))
+
+	RETURN RULE_VALUE
+) "
+300000302365164,"
+/* ******************************************************************
+ * Formula Name     : AXEW_HR_LENGTH_OF_SERVICE_FF
+ * Formula Type     : Extract Rule
+ * Description      : Returns Employee Seniority Date
+ *
+ * Change History
+ * --------------
+ *
+ * Name 	                               Ver      Date         Description
+ *-----------------------------------     ------   ------------ ------------
+   Manish Chauhan                         1.0	   09-Feb-2022  Initial Draft
+************************************************************************** */
+
+
+DEFAULT FOR DATA_ELEMENTS IS EMPTY_TEXT_TEXT
+
+INPUTS ARE DATA_ELEMENTS (TEXT_TEXT)
+
+TRACE_FLAG = 'N'
+S_LE_NAME = ' '
+RULE_VALUE = ' '
+
+IF (DATA_ELEMENTS.EXISTS('Person_Id')) THEN
+(
+	L_Person_Id = DATA_ELEMENTS['Person_Id']
+
+	IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE('Person_Id : '||L_Person_Id))
+	
+    RULE_VALUE = GET_VALUE_SET('AXE_HR_SENIORITY_DATE_VS','|=Person_Id='''||L_Person_Id||'''')	
+	
+	IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' Seniority Date: '||RULE_VALUE ))
+
+	RETURN RULE_VALUE
+) "

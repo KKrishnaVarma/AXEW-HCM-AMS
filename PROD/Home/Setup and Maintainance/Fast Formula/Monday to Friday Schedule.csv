@@ -1,0 +1,32 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000168532952,"
+/***************************************************************************************
+FORMULA NAME	: Monday to Friday Schedule
+FORMULA TYPE	: Flow Schedule
+DESCRIPTION	: Formula to return NEXT_SCHEDULED_DATE by skipping Saturday and Sunday
+NEXT_SCHEDULED_DATE - This will be a date time value with yyyy-MM-dd HH:mm:ss format.
+****************************************************************************************/
+
+/* Inputs */
+INPUTS ARE SCHEDULED_DATE(DATE)
+
+/* Calculations */
+l_add_days = 1
+
+/* Get day number for Friday. */
+l_friday 		= TO_DATE('2021-01-01', 'YYYY-MM-DD') 
+l_friday_number	= TO_CHAR(l_friday, 'D')
+
+l_day_number	= TO_CHAR(SCHEDULED_DATE, 'D') 
+
+IF l_day_number = l_friday_number THEN 
+(
+  l_add_days = 3 
+)
+
+NEXT_SCHEDULED_DATE = ADD_DAYS(SCHEDULED_DATE, l_add_days)
+
+/* Returns */
+RETURN NEXT_SCHEDULED_DATE
+
+/* End Formula Text */"

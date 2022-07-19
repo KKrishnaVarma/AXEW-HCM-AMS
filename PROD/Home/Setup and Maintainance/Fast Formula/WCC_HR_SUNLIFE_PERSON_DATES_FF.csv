@@ -1,0 +1,21 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000171806302,"
+/***************************************************************************************************
+Formula Name: WCC_HR_SUNLIFE_PERSON_DATES_FF
+Formula Type: Extract Rule
+Description : Fast Formula to extract Person Start Date and Last Update Date 
+Org/Developer                         Date         		Comments
+----------------------------------------------------------------------------------------------------
+Deloitte/Karthikeya Andey	       	4/24/2021   		Initial version
+***************************************************************************************************/
+l_rule_value		 	= ' '
+l_person_id         	= GET_CONTEXT(PERSON_ID,1)
+l_person_id_ch      	= TO_CHAR(l_person_id)
+
+l_rule_value		 	= GET_VALUE_SET('WCC_HR_SUNLIFE_PERSON_DATES_VS', '|=P_PERSON_ID='
+								||l_person_id_ch
+								||'|')
+
+rule_value = TRIM(l_rule_value)				
+
+RETURN rule_value"

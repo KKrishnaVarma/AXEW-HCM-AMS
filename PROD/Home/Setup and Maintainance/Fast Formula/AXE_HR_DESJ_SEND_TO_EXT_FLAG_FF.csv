@@ -1,0 +1,107 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000036915600,"
+/* ******************************************************************
+ * Formula Name     : AXE_HR_DESJ_SEND_TO_EXT_FLAG_FF
+ * Rice ID          : HCM_I039 - Desjardins interface 
+ * Formula Type     : Extract Rule
+ * Description      : Returns send to extract flag 
+ *
+ * Change History
+ * --------------
+ *
+ * Name 	                               Ver      Date         Description
+ *-----------------------------------     ------   ------------ ------------
+   Srinivas Thurakapalli                    1.0	   2019-May-29  Initial Draft
+************************************************************************** */
+
+
+DEFAULT  FOR DATA_ELEMENTS IS EMPTY_TEXT_TEXT
+DEFAULT  FOR PER_ASG_NORMAL_HOURS IS 0
+
+INPUTS ARE DATA_ELEMENTS      (TEXT_TEXT)
+
+l_leg_code= ' '
+l_rule_value= ' '
+l_send_to_extract = ' '
+l_person_age = ' '
+l_perm_temp = ' '
+l_union_name = ' '
+l_actual_term_date = ' ' 
+l_effective_date = '1900-01-01T00:00:00.000Z' (DATE) 
+l_desjardins_term_days = 0
+l_term_date_str = ' '
+l_actual_term_date_dt='1900-01-01T00:00:00.000Z' (DATE) 
+l_status_code = ' '
+l_union_code = ' '
+l_person_age_num = 0
+
+l_effective_date=GET_CONTEXT(EFFECTIVE_DATE, '4712-12-31T00:00:00.000Z' (DATE))
+
+l_desjardins_term_days=GET_PARAMETER_VALUE_NUMBER('DESJARDINS_TERM_DAYS')
+
+l_term_date=ADD_DAYS (l_effective_date,-l_desjardins_term_days)
+
+IF(DATA_ELEMENTS.EXISTS('Legal_Employer_Name')) THEN
+(	l_legal_emp=DATA_ELEMENTS['Legal_Employer_Name'])
+
+
+IF(DATA_ELEMENTS.EXISTS('Legislative_Code')) THEN
+(	l_leg_code=DATA_ELEMENTS['Legislative_Code'])
+
+
+IF(DATA_ELEMENTS.EXISTS('Permanent_Temporary')) THEN
+(	l_perm_temp=DATA_ELEMENTS['Permanent_Temporary'])
+
+
+IF(DATA_ELEMENTS.EXISTS('Person_Age')) THEN
+(	l_person_age=DATA_ELEMENTS['Person_Age']
+IF l_person_age <> ' ' THEN 
+(l_person_age_num=TO_NUMBER(l_person_age)))
+
+IF(DATA_ELEMENTS.EXISTS('Union_Code')) THEN
+(	l_union_name=DATA_ELEMENTS['Union_Code']
+l_union_code=SUBSTR(l_union_name,1,3))
+IF(DATA_ELEMENTS.EXISTS('Assignment_Status_Type')) THEN
+(	l_status_code=DATA_ELEMENTS['Assignment_Status_Type'])
+
+
+
+IF(DATA_ELEMENTS.EXISTS('Actual_Termination_Date')) THEN
+(	l_actual_term_date=DATA_ELEMENTS['Actual_Termination_Date']
+l_actual_term_date_dt = TO_DATE(SUBSTR(l_actual_term_date,1,10),'YYYY/MM/DD')
+
+
+)
+ 
+ 
+ 
+IF (l_leg_code = 'CA' AND PER_ASG_NORMAL_HOURS >=20 
+AND l_person_age_num <= 70 AND l_perm_temp ='R'  AND (l_union_code <> '702' OR l_union_code <> '419')
+AND ((l_status_code = 'ACTIVE' OR l_status_code = 'SUSPENDED' ) OR l_actual_term_date_dt >= l_term_date))THEN
+( l_send_to_extract = 'Y' )
+
+ IF ( l_leg_code <> 'CA' ) THEN
+( l_send_to_extract = 'N' )
+ 
+ IF ( PER_ASG_NORMAL_HOURS < 20 ) THEN
+( l_send_to_extract = 'N' )
+
+ IF ( l_person_age_num > 70 ) THEN
+( l_send_to_extract = 'N' )
+
+ IF (l_perm_temp <>'R' ) THEN
+( l_send_to_extract = 'N' )
+
+if ( l_union_code = '702' OR l_union_code = '419' ) THEN
+( l_send_to_extract = 'N')
+
+ 
+
+
+
+RULE_VALUE=l_send_to_extract
+
+RETURN RULE_VALUE
+ 
+ 
+"

@@ -1,0 +1,26 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000171806289,"
+/***************************************************************************************************
+Formula Name: WCC_HR_WESCO_PAYROLL_VALIDATION_FF
+Formula Type: Extract Rule to validate if Wesco US Payroll for ADP US Payroll Interface
+Description : Fetches Termination Details
+Org/Developer                         Date         		Comments
+----------------------------------------------------------------------------------------------------
+Deloitte/Karthikeya Andey	       	4/02/2021   	Initial version
+***************************************************************************************************/
+DEFAULT FOR DATA_ELEMENTS IS EMPTY_TEXT_TEXT
+
+INPUTS ARE DATA_ELEMENTS (TEXT_TEXT)
+
+l_rule_value	= ' '
+l_payroll		= ' '
+
+IF(DATA_ELEMENTS.EXISTS('Company_Code_Equivalent')) THEN
+(
+	l_payroll		= DATA_ELEMENTS['Company_Code_Equivalent']
+	l_rule_value	= GET_LOOKUP_MEANING('WCC_HR_ADP_US_PAYROLL_LKP', l_payroll)
+)
+
+rule_value = TRIM(l_rule_value)
+
+RETURN rule_value"

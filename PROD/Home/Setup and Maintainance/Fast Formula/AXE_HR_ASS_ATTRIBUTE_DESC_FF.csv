@@ -1,0 +1,36 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000093869489,"
+/* ******************************************************************
+ * Formula Name     : AXE_HR_ASS_ATTRIBUTE_DESC_FF
+ * Formula Type     : Extract Rule
+ * Description      : Returns the ASS_ATTRIBUTE3 desc
+ *
+ * Change History
+ * --------------
+ *
+ * Name 	                          Ver      Date              Description
+ *-----------------------------------     ------   ------------ ------------
+   Manish                            1.0	   2021-March-31    Initial Draft
+************************************************************************** */
+
+
+DEFAULT FOR DATA_ELEMENTS IS EMPTY_TEXT_TEXT
+
+INPUTS ARE DATA_ELEMENTS (TEXT_TEXT)
+
+TRACE_FLAG = 'N'
+RULE_VALUE = ' '
+
+IF DATA_ELEMENTS.EXISTS('ASS_ATTRIBUTE3') THEN
+(
+S_ATTRIBUTE3 = DATA_ELEMENTS['ASS_ATTRIBUTE3']
+
+
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE('ASS_ATTRIBUTE3 : '||S_ATTRIBUTE3))
+
+RULE_VALUE = GET_VALUE_SET('AXE_HR_ASG_ATTRIBUTE3_DESC','|=ASG_ATTRIBUTE3='''||S_ATTRIBUTE3||'''')
+           
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' Attribute3 Desc : '||RULE_VALUE ))
+)
+
+RETURN RULE_VALUE"

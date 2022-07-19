@@ -1,0 +1,28 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000171806285,"
+/***************************************************************************************************
+Formula Name: WCC_HR_ZAPPROVED_GROUP_CODE_FF
+Formula Type: Extract Rule
+Description : Fetches Group Id based on Branch Id
+Extract Name: 
+Org/Developer                         Date         		Comments
+----------------------------------------------------------------------------------------------------
+Deloitte/Karthikeya Andey	       	2/19/2021   	Initial version
+***************************************************************************************************/
+DEFAULT FOR PER_ASG_ATTRIBUTE6 IS ' '
+
+l_branch_id		= ' '
+l_group_id		= ' '
+
+IF PER_ASG_ATTRIBUTE6 WAS NOT DEFAULTED 
+THEN 
+(
+	l_branch_id 	= PER_ASG_ATTRIBUTE6
+	l_group_id	 	= GET_TABLE_VALUE('AXEW_HCM_WESCO_COA_MATRIX_UDT', 'AXEW_GROUP_ID', TRIM(l_branch_id), ' ')
+
+)
+
+RULE_VALUE = TRIM(l_group_id)
+
+RETURN RULE_VALUE
+"

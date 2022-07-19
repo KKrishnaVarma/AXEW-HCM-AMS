@@ -1,0 +1,48 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000036915632,"
+/* ******************************************************************
+ * Formula Name     : AXE_HR_EMPR_CONT_VALUE_FF
+ * Formula Type     : Extract Rule
+ * Description      : Returns Formatted Employer Contribution Value.
+ *
+ * Change History
+ * --------------
+ *
+ * Name 	                          Ver      Date          Description
+ *-----------------------------------     ------   ------------ ------------
+   Srinivas Thurakapalli              1.0	   2019-Sep-19  Initial Draft
+************************************************************************** */
+
+
+DEFAULT FOR DATA_ELEMENTS IS EMPTY_TEXT_TEXT
+
+INPUTS ARE DATA_ELEMENTS (TEXT_TEXT)
+
+TRACE_FLAG = 'N'
+RULE_VALUE = 'X'
+
+L_CONT_TYPE = ' '
+L_CONT_VALUE = ' '
+
+IF DATA_ELEMENTS.EXISTS('Employer_Contribution_Value') THEN
+(
+L_CONT_VALUE = DATA_ELEMENTS['Employer_Contribution_Value']
+
+IF DATA_ELEMENTS.EXISTS('Employer_Contribution_Type') THEN
+(
+L_CONT_TYPE= DATA_ELEMENTS['Employer_Contribution_Type']
+)
+
+IF L_CONT_TYPE ='Amount' THEN
+(
+RULE_VALUE = L_CONT_VALUE || '.00£'
+)
+ELSE
+(
+IF L_CONT_TYPE ='Percentage' THEN
+(
+RULE_VALUE = L_CONT_VALUE || '%'
+)
+)
+)
+RETURN RULE_VALUE"

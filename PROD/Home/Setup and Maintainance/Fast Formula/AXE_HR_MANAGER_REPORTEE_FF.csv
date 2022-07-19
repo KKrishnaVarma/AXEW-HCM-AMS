@@ -1,0 +1,37 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000094084376,"
+/* ******************************************************************
+ * Formula Name     : AXE_HR_MANAGER_REPORTEE_FF
+ * Formula Type     : Extract Rule
+ * Description      : Returns Manager's Reportee
+ *
+ * Change History
+ * --------------
+ *
+ * Name 	                          Ver      Date              Description
+ *-----------------------------------     ------   ------------ ------------
+   Manish                            1.0	   2021-March-31    Initial Draft
+************************************************************************** */
+
+
+DEFAULT FOR DATA_ELEMENTS IS EMPTY_TEXT_TEXT
+
+INPUTS ARE DATA_ELEMENTS (TEXT_TEXT)
+
+TRACE_FLAG = 'Y'
+RULE_VALUE = ' '
+L_EFFECTIVE_DATE =  get_context(effective_date, '0001/01/01 00:00:00'(date))
+DATE_ASSIGNED =  '1901/01/01 00:00:00' (date)
+
+IF DATA_ELEMENTS.EXISTS('Person_ID') THEN
+(
+L_Person_id = DATA_ELEMENTS['Person_ID']
+DATE_ASSIGNED = L_EFFECTIVE_DATE
+
+RULE_VALUE = GET_VALUE_SET('AXE_MANAGER_REPORTEE_VS','|=Person_id='''||L_Person_id||''''||'|Effective_date='||to_char(DATE_ASSIGNED,'YYYY-MM-DD')||'''')
+         
+           
+
+)
+
+RETURN RULE_VALUE"

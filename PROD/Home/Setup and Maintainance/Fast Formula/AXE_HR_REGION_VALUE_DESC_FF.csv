@@ -1,0 +1,34 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000094084377,"
+/* ******************************************************************
+ * Formula Name     : AXE_HR_REGION_VALUE_DESC_FF
+ * Formula Type     : Extract Rule
+ * Description      : Returns Assignment Region Value Desc
+ *
+ * Change History
+ * --------------
+ *
+ * Name 	                          Ver      Date              Description
+ *-----------------------------------     ------   ------------ ------------
+   Manish                            1.0	   2021-April-26    Initial Draft
+************************************************************************** */
+
+
+DEFAULT FOR DATA_ELEMENTS IS EMPTY_TEXT_TEXT
+
+INPUTS ARE DATA_ELEMENTS (TEXT_TEXT)
+
+TRACE_FLAG = 'Y'
+RULE_VALUE = ' '
+L_Region_Code = ' '
+
+IF DATA_ELEMENTS.EXISTS('ASG_REGION_VALUE') THEN
+(
+L_Region_Code = DATA_ELEMENTS['ASG_REGION_VALUE']
+
+RULE_VALUE = GET_VALUE_SET('AXE_HR_REGION_VALUE_DESC_VS','|=L_Region_Code='''||L_Region_Code||'''')          
+IF TRACE_FLAG = 'N' THEN (RET = ESS_LOG_WRITE(' Region Value Desc : '||RULE_VALUE ))
+
+)
+
+RETURN RULE_VALUE"

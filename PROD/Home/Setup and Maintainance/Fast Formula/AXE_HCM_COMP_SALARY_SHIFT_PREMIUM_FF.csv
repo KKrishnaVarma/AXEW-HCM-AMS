@@ -1,0 +1,71 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000063997117,"
+/*********************************************************************************************
+Deloitte Changes Log
+**********************************************************************************************
+FORMULA NAME: AXE_HCM_COMP_SALARY_SHIFT_PREMIUM_FF
+FORMULA TYPE: Compensation Default and Override
+DESCRIPTION : This formula determines the Shift premium amount for Salary Review Plan                                        
+Name             Date                  Comments
+----------------------------------------------------------------------------------------------
+Tanvi Khadse     22-May-2020           Initial Version
+**********************************************************************************************/
+
+default for PER_ASG_LEGISLATION_CODE is 'XX'
+default for CMP_ASSIGNMENT_SALARY_BASIS_CODE is 'XX'
+default_data_value for ELEMENT_ENTRY_BASE_ELEMENT_NAME  is 'XX'
+default_data_value for ELEMENT_ENTRY_BASE_VALUE_NAME  is 'XX'
+default_data_value for ELEMENT_ENTRY_VALUE is '0'
+default_data_value for ELEMENT_ENTRY_INPUT_CURRENCY_CODE is 'XX'
+
+inputs are CMP_IV_PLAN_START_DATE (date), CMP_IV_PLAN_END_DATE (date)
+
+l_debug = 'N'
+l_default_value = 0
+l_arr_index =1
+l_shift_premium = 0
+l_frequency = 'Hourly '
+
+if CMP_IV_PLAN_END_DATE was not defaulted then
+(
+ l_effective_date = CMP_IV_PLAN_END_DATE
+)
+else
+(
+ l_effective_date = get_context(EFFECTIVE_DATE, '2020/01/01 00:00:00'(date))
+)
+
+if (CMP_ASSIGNMENT_SALARY_BASIS_CODE = 'HOURLY') then
+(
+ l_frequency = 'Hourly '
+)
+if (CMP_ASSIGNMENT_SALARY_BASIS_CODE = 'ANNUAL' OR CMP_ASSIGNMENT_SALARY_BASIS_CODE = 'MONTHLY') then
+(
+ l_frequency = 'Annual '
+)
+  
+change_contexts(DATE_EARNED = l_effective_date,EFFECTIVE_DATE = l_effective_date)
+(
+ while ELEMENT_ENTRY_VALUE.exists(l_arr_index) loop
+ (
+  if (ELEMENT_ENTRY_BASE_ELEMENT_NAME[l_arr_index] = 'AXE '||PER_ASG_LEGISLATION_CODE||' Shift Premium '||l_frequency||ELEMENT_ENTRY_INPUT_CURRENCY_CODE[l_arr_index] and ELEMENT_ENTRY_BASE_VALUE_NAME[l_arr_index] = 'Amount') then
+  (
+   l_shift_premium = to_number(ELEMENT_ENTRY_VALUE[l_arr_index])
+   exit
+   if (l_debug = 'Y') then
+	(
+	 l_log = SET_LOG('ELEMENT_ENTRY_BASE_ELEMENT_NAME:'||ELEMENT_ENTRY_BASE_ELEMENT_NAME[l_arr_index])
+	 l_log = SET_LOG('ELEMENT_ENTRY_BASE_VALUE_NAME:'||ELEMENT_ENTRY_BASE_VALUE_NAME[l_arr_index])
+	 l_log = SET_LOG('l_shift_premium:'||to_char(l_shift_premium))
+	)
+  )
+  l_arr_index = l_arr_index + 1
+ )
+)
+
+l_default_value = l_shift_premium
+
+return l_default_value
+
+
+"

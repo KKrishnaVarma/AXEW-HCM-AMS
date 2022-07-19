@@ -1,0 +1,75 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000036915631,"
+/* ******************************************************************
+ * Formula Name     : AXE_HR_PERSON_SALARY_RULE_FF
+ * Formula Type     : Extract Rule
+ * Description      : To get the salary amount and its effective date based on Assignment ID and Effective Date input parameters  
+ *                    
+ *
+ 
+ * Change History
+ * --------------
+ *
+ * Name 	                               Ver      Date         Description
+ *-----------------------------------     ------   ------------ ------------
+   Srinivas Thurakapalli                   1.0	   2019-Sep-23  Initial Draft
+***************************************************************************** */
+
+
+DEFAULT FOR CMP_ASSIGNMENT_SALARY_DATE_FROM IS '1901/01/01 00:00:00' (date)
+
+DEFAULT FOR CMP_ASSIGNMENT_SALARY_AMOUNT IS 0
+DEFAULT FOR PER_SYS_DATE_TIME IS  'DUMMY'  
+
+INPUTS ARE DATA_ELEMENTS (TEXT_TEXT)
+
+L_ASSNG_ID = 0
+S_ASSNG_ID = 'NO DATA'
+
+S_EXT_DATE  = 'NO DATA'
+ 
+L_EXT_DATE = '1901/01/01 00:00:00' (date)
+L_SAL_AMOUNT = 0
+L_SAL_AMOUNT_1 = 'NO DATA'
+
+IF(DATA_ELEMENTS.EXISTS('Assignment_ID')) THEN
+(	S_ASSNG_ID=DATA_ELEMENTS['Assignment_ID']
+L_ASSNG_ID = TO_NUMBER(S_ASSNG_ID)
+
+
+L_EXT_DATE=LAST_DAY(TO_DATE(SUBSTR(PER_SYS_DATE_TIME,1,10),'YYYY-MM-DD'))
+
+
+CHANGE_CONTEXTS(EFFECTIVE_DATE= L_EXT_DATE, HR_ASSIGNMENT_ID = L_ASSNG_ID) 
+	(
+
+	L_SAL_FROM_DATE  = CMP_ASSIGNMENT_SALARY_DATE_FROM
+
+           L_SAL_AMOUNT  = CMP_ASSIGNMENT_SALARY_AMOUNT
+
+IF CMP_ASSIGNMENT_SALARY_DATE_FROM WAS DEFAULTED AND CMP_ASSIGNMENT_SALARY_AMOUNT WAS DEFAULTED THEN 
+(
+RULE_VALUE = ' '
+)
+ELSE
+(
+
+
+IF INSTR(TO_CHAR(L_SAL_AMOUNT),'.',-3,1) = 0 THEN 
+(
+ L_SAL_AMOUNT_1=TO_CHAR(L_SAL_AMOUNT) ||'.00'
+ )
+ELSE 
+(
+ L_SAL_AMOUNT_1=TO_CHAR(L_SAL_AMOUNT)
+ )
+
+
+
+RULE_VALUE = TO_CHAR(L_SAL_FROM_DATE,'YYYY-MM-DD')||L_SAL_AMOUNT_1
+)
+
+
+)
+)
+RETURN RULE_VALUE"

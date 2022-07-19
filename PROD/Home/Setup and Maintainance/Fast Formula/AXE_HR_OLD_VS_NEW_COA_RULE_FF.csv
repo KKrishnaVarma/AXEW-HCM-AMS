@@ -1,0 +1,47 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000036915644,"
+/* ******************************************************************
+ * Formula Name     : AXE_HR_OLD_VS_NEW_COA_RULE_FF
+ * Formula Type     : Extract Rule
+ * Description      : Returns Legal Entity Name if present in ""AXE_HCM_OLD_VS_NEW_COA_MAPPING"" lookup.
+ *
+ * Change History
+ * --------------
+ *
+ * Name 	                               Ver      Date         Description
+ *-----------------------------------     ------   ------------ ------------
+   Abu Thahir                             1.0	   2019-July-22  Initial Draft
+************************************************************************** */
+
+
+DEFAULT FOR DATA_ELEMENTS IS EMPTY_TEXT_TEXT
+
+INPUTS ARE DATA_ELEMENTS (TEXT_TEXT)
+
+TRACE_FLAG = 'N'
+S_LEGAL_ENTITY = 'N'
+RULE_VALUE = 'No'
+
+IF (DATA_ELEMENTS.EXISTS('Legal_Entity')) THEN
+(
+	S_LEGAL_ENTITY = DATA_ELEMENTS['Legal_Entity']
+
+	IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' Legal Entity : '||S_LEGAL_ENTITY))
+
+	RULE_VALUE = GET_LOOKUP_MEANING('AXE_HCM_OLD_VS_NEW_COA_MAPPING',S_LEGAL_ENTITY) 
+
+	IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' Value Set Returns : '||RULE_VALUE ))
+
+IF RULE_VALUE <> ' ' THEN
+(
+RULE_VALUE = 'Yes'
+)
+ELSE
+(
+RULE_VALUE = 'No'
+)
+
+) 
+
+RETURN RULE_VALUE 
+ "

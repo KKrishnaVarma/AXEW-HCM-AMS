@@ -1,0 +1,35 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000094084371,"
+/* ******************************************************************
+ * Formula Name     : AXE_HR_GET_EE_CATEGORY_DESC_FF
+ * Formula Type     : Extract Rule
+ * Description      : Returns EE01 Category Description
+ *
+ * Change History
+ * --------------
+ *
+ * Name 	                               Ver      Date         Description
+ *-----------------------------------     ------   ------------ ------------
+   Manish                             1.0	   2021-Apr-29  Initial Draft
+************************************************************************** */
+
+
+DEFAULT FOR DATA_ELEMENTS IS EMPTY_TEXT_TEXT
+
+INPUTS ARE DATA_ELEMENTS (TEXT_TEXT)
+
+TRACE_FLAG = 'N'
+RULE_VALUE = ' '
+
+IF (DATA_ELEMENTS.EXISTS('EE_Category_description')) THEN
+(
+	S_EE_CODE = DATA_ELEMENTS['EE_Category_description']
+
+	IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' EE_Category_code : '||S_EE_CODE))
+
+	RULE_VALUE = GET_LOOKUP_MEANING('HRX_US_EEO1_JOB_CATEGORY',S_EE_CODE)
+
+	IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' EE_Category_description : '||RULE_VALUE ))
+
+	RETURN RULE_VALUE
+) "

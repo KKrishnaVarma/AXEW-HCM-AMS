@@ -1,0 +1,216 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000036915667,"
+/* ******************************************************************
+ * Formula Name     : AXE_SUNLIFE_HR_SALARY_ASOF_DATE_RULE_FF
+ * Formula Type     : Extract Rule
+ * Description      : To get the salary amount and its effective date based on Assignment ID and Effective Date input parameters  
+ *                    
+ *
+ * Change History
+ * --------------
+ *
+ * Name 	                               Ver      Date         Description
+ *-----------------------------------      ------   ------------ ------------
+   Aditya Patial			                   1.0	   2019-Oct-13  Initial Draft
+***************************************************************************** */
+
+
+DEFAULT FOR CMP_ASSIGNMENT_SALARY_DATE_FROM IS '1901/01/01 00:00:00' (date)
+DEFAULT_DATA_VALUE FOR ELEMENT_ENTRY_BASE_ELEMENT_NAME IS 'X'
+DEFAULT_DATA_VALUE FOR ELEMENT_ENTRY_BASE_VALUE_NAME IS 'X'
+DEFAULT_DATA_VALUE FOR ELEMENT_ENTRY_EFFECTIVE_START_DATE IS '1951/01/01' (date)
+DEFAULT_DATA_VALUE FOR ELEMENT_ENTRY_EFFECTIVE_END_DATE IS '4712/12/31' (date)
+DEFAULT_DATA_VALUE FOR ELEMENT_ENTRY_VALUE IS 'X'
+
+DEFAULT FOR CMP_ASSIGNMENT_SALARY_AMOUNT IS 0
+DEFAULT FOR CMP_ASSIGNMENT_SALARY_ANNUAL_AMOUNT IS 0 
+DEFAULT FOR CMP_ASSIGNMENT_SALARY_BASIS_CODE IS  'X'  
+DEFAULT FOR CMP_ASSIGNMENT_SALARY_CURRENCY_CODE IS  'CAD' 
+
+INPUTS ARE DATA_ELEMENTS (TEXT_TEXT)
+
+TRACE_FLAG = 'N'
+
+L_TERM_DATE = '1901-01-01T00:00:00.000Z' (DATE)
+L_TERM_HIST = '1901-01-01T00:00:00.000Z' (DATE)
+L_ASSNG_ID = 0
+S_ASSNG_ID = 'NO DATA'
+
+S_PAYROL_REL_ID = ' '
+S_SAL_AMOUNT = 'X'
+L_SAL_AMOUNT = 0
+l_element_sum = 0
+L_EE_VALUE =0
+l_found ='X'
+l_value = 'X'
+L_FINAL_SAL_AMOUNT = 'X'
+L_SAL_CURRENCY_CODE = 'CAD'
+L_SAL_BASE_CODE ='X'
+L_LEG_CODE = 'X'
+L_PAYROL_REL_ID = 0
+L_FINAL_SAL_AMOUNT_NUM = 0
+L_COUNTER = 0
+S_TERM_DATE = ' '
+S_DEFER_DAYS = ' '
+L_TERM_DAYS = 0
+L_ACTIVE = 'Y'
+RULE_VALUE = '0'
+I=1
+J=1 
+
+
+
+
+l_effective_date=GET_CONTEXT(EFFECTIVE_DATE, '4712-12-31T00:00:00.000Z' (DATE))
+
+L_TERM_DAYS=GET_PARAMETER_VALUE_NUMBER('DEFER_TERM_STATUS_DAYS')
+
+
+
+IF(DATA_ELEMENTS.EXISTS('Assignment_ID')) THEN
+(
+S_ASSNG_ID = DATA_ELEMENTS['Assignment_ID']
+L_ASSNG_ID = TO_NUMBER(S_ASSNG_ID)
+)
+
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' L_TERM_DATE = '||TO_CHAR(L_TERM_DATE,'YYYY-MM-DD') ||' , ' || ' l_effective_date = '||TO_CHAR(l_effective_date) ||' , ' || ' L_TERM_DAYS = '||TO_CHAR(L_TERM_DAYS) )) 
+
+IF (DATA_ELEMENTS.EXISTS('Actual_Termination_Date')) THEN
+	(
+	S_TERM_DATE = DATA_ELEMENTS['Actual_Termination_Date']
+	L_TERM_DATE = TO_DATE(SUBSTR(S_TERM_DATE,1,10),'YYYY/MM/DD')
+		L_TERM_HIST=ADD_DAYS( l_effective_date , - L_TERM_DAYS  ) 
+		
+		IF L_TERM_DATE < L_TERM_HIST THEN 
+		(
+		 L_ACTIVE = 'N'
+		)
+	)
+	
+
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' L_TERM_DATE = '||TO_CHAR(L_TERM_DATE,'YYYY-MM-DD') ||' , ' || ' l_effective_date = '||TO_CHAR(l_effective_date) ||' , ' || ' L_TERM_DAYS = '||TO_CHAR(L_TERM_DAYS)||'L_TERM_HIST'||TO_CHAR(L_TERM_HIST)||'L_ACTIVE'||L_ACTIVE )) 
+
+IF(DATA_ELEMENTS.EXISTS('Legislative_Code')) THEN 
+(
+L_LEG_CODE = DATA_ELEMENTS['Legislative_Code']
+
+)
+
+
+
+IF(DATA_ELEMENTS.EXISTS('Payroll_Relationship_Id')) THEN 
+(
+S_PAYROL_REL_ID = DATA_ELEMENTS['Payroll_Relationship_Id']
+L_PAYROL_REL_ID = TO_NUMBER(S_PAYROL_REL_ID)
+)
+
+IF L_ACTIVE = 'Y' THEN
+(
+
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' L_TERM_DATE = '||TO_CHAR(L_TERM_DATE,'YYYY-MM-DD') ||' , ' || ' L_ASSNG_ID = '||TO_CHAR(L_ASSNG_ID) )) 
+
+    IF (S_TERM_DATE <>' ') THEN 
+       (
+		DATE_ASSIGNED =  L_TERM_DATE
+		)
+		ELSE
+		(
+		DATE_ASSIGNED =  l_effective_date
+		)
+
+
+
+     CHANGE_CONTEXTS(EFFECTIVE_DATE= DATE_ASSIGNED, HR_ASSIGNMENT_ID = L_ASSNG_ID) 
+	   (
+		L_SAL_FROM_DATE  = CMP_ASSIGNMENT_SALARY_DATE_FROM
+		L_SAL_AMOUNT  = CMP_ASSIGNMENT_SALARY_AMOUNT
+		L_SAL_BASE_CODE = CMP_ASSIGNMENT_SALARY_BASIS_CODE
+		L_SAL_CURRENCY_CODE = CMP_ASSIGNMENT_SALARY_CURRENCY_CODE
+	   )
+
+
+
+
+	IF L_SAL_BASE_CODE ='HOURLY' THEN
+	(
+	L_COUNTER=3
+	)
+	ELSE
+	(
+	L_COUNTER=1
+	)
+
+
+
+	
+	
+	IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE('L_LEG_CODE: = '||L_LEG_CODE ))
+	IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE('L_SAL_BASE_CODE = '||L_SAL_BASE_CODE ))
+	IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE('L_PAYROL_REL_ID = '||to_Char(L_PAYROL_REL_ID) ))
+	IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE('l_effective_date = '||to_Char(l_effective_date,'YYYY-MM-DD') ))
+	IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE('Basepay = '||to_Char(L_SAL_AMOUNT) ))
+ CHANGE_CONTEXTS( PAYROLL_RELATIONSHIP_ID =L_PAYROL_REL_ID,  DATE_EARNED = l_effective_date ,EFFECTIVE_DATE = l_effective_date)
+	( 
+		WHILE (ELEMENT_ENTRY_BASE_ELEMENT_NAME.EXISTS(I) AND J<=L_COUNTER ) LOOP
+		(
+			IF (UPPER(SUBSTR(ELEMENT_ENTRY_BASE_ELEMENT_NAME[I] ,-10,6)) = L_SAL_BASE_CODE AND SUBSTR(ELEMENT_ENTRY_BASE_ELEMENT_NAME[I],5,2) = L_LEG_CODE  
+			AND ELEMENT_ENTRY_BASE_VALUE_NAME[I] = 'Amount'
+        
+				) THEN
+				(
+                             l_value = ELEMENT_ENTRY_VALUE[I]
+							 L_EE_VALUE=TO_NUMBER(l_value)
+                           	 l_element_sum = l_element_sum + L_EE_VALUE
+								J = J+1					 
+							IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE('Inside IF:l_value = '||l_value ))
+							IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE('l_element_sum = '||to_char(l_element_sum) ))		
+				)
+	
+   
+	
+
+				IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE('Element Name = '||ELEMENT_ENTRY_BASE_ELEMENT_NAME[I]))
+				IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE('Sal_Base_Code = '||UPPER(SUBSTR(ELEMENT_ENTRY_BASE_ELEMENT_NAME[I] ,-10,6))))
+				IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE('bSE = '||SUBSTR(ELEMENT_ENTRY_BASE_ELEMENT_NAME[I],5,2) ))
+				IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE('Element Entry StartDate: = '||to_char(ELEMENT_ENTRY_EFFECTIVE_START_DATE[I],'YYYY-MM-DD') ))
+				IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE('Element Entry EndDate: = '||to_char(ELEMENT_ENTRY_EFFECTIVE_END_DATE[I],'YYYY-MM-DD') ))
+				IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE('Element Entry Value: = '||ELEMENT_ENTRY_BASE_VALUE_NAME[I] ))
+
+	
+			I = I+1
+		)
+		  L_FINAL_SAL_AMOUNT_NUM =l_element_sum + L_SAL_AMOUNT
+		  
+	)
+/* --------- Override calculation fo HOURLY employees - Starts ----------*/
+
+   IF (DATA_ELEMENTS.EXISTS('Working_Hours')) THEN
+	(
+		S_WORKING_HOURS = DATA_ELEMENTS['Working_Hours']
+		L_WORKING_HOURS = TO_NUMBER(S_WORKING_HOURS)
+		
+			IF L_SAL_BASE_CODE = 'HOURLY' THEN
+			(
+			L_FINAL_SAL_AMOUNT_NUM = (L_FINAL_SAL_AMOUNT_NUM * L_WORKING_HOURS * 52)
+			)
+   )
+
+/* --------- Override calculation fo HOURLY employees - Ends ----------*/
+
+L_FINAL_SAL_AMOUNT = to_char(ROUND(L_FINAL_SAL_AMOUNT_NUM,2))
+
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE('L_FINAL_SAL_AMOUNT'||L_FINAL_SAL_AMOUNT||'L_SAL_FROM_DATE'||TO_CHAR(L_SAL_FROM_DATE,'YYYY-MM-DD') ))
+
+IF L_SAL_CURRENCY_CODE <> 'X' THEN
+(
+RULE_VALUE = TO_CHAR(L_SAL_FROM_DATE,'YYYYMMDD')||'*'||L_SAL_CURRENCY_CODE||'*'||L_FINAL_SAL_AMOUNT
+)
+ELSE
+(
+RULE_VALUE = '0'
+)
+
+)
+
+
+RETURN RULE_VALUE"

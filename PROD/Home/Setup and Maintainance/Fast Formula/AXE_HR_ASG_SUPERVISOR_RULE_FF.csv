@@ -1,0 +1,54 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000036915624,"
+/* ******************************************************************
+ * Formula Name     : AXE_HR_ASG_SUPERVISOR_RULE_FF
+ * Rice ID          : HR_I026
+ * Formula Type     : Extract Rule
+ * Description      : Returns ""Y"" if the employee is a Line Manger
+ *
+ * Change History
+ * --------------
+ *
+ * Name 	                               Ver      Date         Description
+ *-----------------------------------     ------   ------------ ------------
+   Abu Thahir                             1.0	   2019-Aug-12  Initial Draft
+***************************************************************************** */
+
+
+DEFAULT FOR DATA_ELEMENTS IS EMPTY_TEXT_TEXT
+DEFAULT FOR L_VALUE is ' '
+DEFAULT FOR L_EFF_DT is ' '
+DEFAULT FOR RULE_VALUE is ' '
+ 
+INPUTS ARE DATA_ELEMENTS (TEXT_TEXT)
+
+TRACE_FLAG = 'N'
+
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' AXE_HR_ASG_SUPERVISOR_RULE_FF- Starts '))
+
+IF DATA_ELEMENTS.EXISTS('Assignment_ID') THEN
+(
+ L_ASSIGNMENT_ID = DATA_ELEMENTS['Assignment_ID']
+ L_EFFECTIVE_DATE = GET_CONTEXT(EFFECTIVE_DATE,TO_DATE('1951/01/01 00:00:00'))
+ L_EFF_DT = TO_CHAR(L_EFFECTIVE_DATE,'YYYY/MM/DD')
+ 
+ IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' L_ASSIGNMENT_ID = ' || L_ASSIGNMENT_ID || ' , ' || ' L_EFF_DT = ' || L_EFF_DT  ))
+
+ L_PARAM  = '|=L_ASSIGNMENT_ID='''||L_ASSIGNMENT_ID||''''||'|L_EFF_DT='''||L_EFF_DT||''''
+ L_VALUE =  GET_VALUE_SET('AXE_HR_ASG_SUPERVISOR_VS',L_PARAM)
+ 
+IF ( ISNULL(L_VALUE) = 'N') THEN
+   (
+     RULE_VALUE = 'EMPLOYEE' 
+   )
+    ELSE 
+   ( 
+     RULE_VALUE = 'MANAGER' 
+   )   
+)
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' RULE_VALUE =  ' || RULE_VALUE))
+
+RETURN RULE_VALUE 
+ 
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' AXE_HR_ASG_SUPERVISOR_RULE_FF- Ends '))
+ "

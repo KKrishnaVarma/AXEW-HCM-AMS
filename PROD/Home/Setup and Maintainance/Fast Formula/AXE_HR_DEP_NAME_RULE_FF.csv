@@ -1,0 +1,55 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000036915627,"
+/* ******************************************************************
+ * Formula Name     : AXE_HR_DEP_NAME_RULE_FF
+ * Formula Type     : Extract Rule
+ * Description      : Returns DepartmentName based on Parameter select
+ *
+ * Change History
+ * --------------
+ *
+ * Name 	                               Ver      Date         Description
+ *-----------------------------------     ------   ------------ ------------
+   Srinivas Thurakapalli                    1.0	   2019-Sep-16  Initial Draft
+************************************************************************** */
+
+
+DEFAULT  FOR DATA_ELEMENTS IS EMPTY_TEXT_TEXT
+
+INPUTS ARE DATA_ELEMENTS      (TEXT_TEXT)
+
+
+L_IS_OLD_COA = ' '
+L_DEP_NAME = ' '
+L_HCM_DEP = ' '
+L_LEG_DEP = ' '
+
+
+
+L_IS_OLD_COA=GET_PARAMETER_VALUE('OLD_COA')
+(
+
+IF(DATA_ELEMENTS.EXISTS('HCM_Department_Name')) THEN
+(	L_HCM_DEP=DATA_ELEMENTS['HCM_Department_Name'])
+
+
+IF(DATA_ELEMENTS.EXISTS('Legacy_Department')) THEN
+(	L_LEG_DEP=DATA_ELEMENTS['Legacy_Department'])
+
+IF L_IS_OLD_COA = 'Y' THEN
+(
+L_DEP_NAME = L_LEG_DEP
+)
+ELSE 
+(
+L_DEP_NAME = L_HCM_DEP
+
+)
+)
+
+RULE_VALUE=L_DEP_NAME
+
+RETURN RULE_VALUE
+ 
+ 
+"

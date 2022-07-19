@@ -1,0 +1,53 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000036915602,"
+/* ******************************************************************
+ * Formula Name     : AXE_HR_SENIORITY_DT_RULE_FF
+ * Rice ID          : HCM_I030,HR_I027
+ * Formula Type     : Extract Rule
+ * Description      : Returns top of stack row for seniority date rule named “Adjusted Length of Service (US)”
+ *
+ * Change History
+ * --------------
+ *
+ * Name 	                               Ver      Date         Description
+ *-----------------------------------     ------   ------------ ------------
+   Abu Thahir                             1.0	   2019-Jun-11  Initial Draft
+***************************************************************************** */
+
+
+DEFAULT FOR DATA_ELEMENTS IS EMPTY_TEXT_TEXT
+DEFAULT FOR L_VALUE is 'X'
+
+INPUTS ARE DATA_ELEMENTS (TEXT_TEXT)
+
+TRACE_FLAG = 'N'
+RULE_VALUE = 'X'
+L_SENIORITY_DATE_CODE = 'X'
+
+
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' AXE_HR_SENIORITY_DT_RULE_FF - Starts' ))
+
+IF DATA_ELEMENTS.EXISTS('Person_ID') THEN
+(
+L_PERSON_ID = DATA_ELEMENTS['Person_ID']
+E_LEG_CODE = DATA_ELEMENTS['Legislation_Code']
+
+IF E_LEG_CODE = 'US' THEN (L_SENIORITY_DATE_CODE = 'AXE_ADJ_LOS_US') ELSE (L_SENIORITY_DATE_CODE = 'AXE_ADJ_LOS')
+
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE('Person Id = '||L_PERSON_ID || ' , ' || 'Seniority Date Code = ' || L_SENIORITY_DATE_CODE))
+
+L_PARAM  = '|=PERSON_ID='''||L_PERSON_ID||''''||'|SENIORITY_DATE_CODE='''||L_SENIORITY_DATE_CODE||''''
+RULE_VALUE = GET_VALUE_SET('AXE_SERVICE_DT_VS',L_PARAM)
+           
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' Seniority Date : '||RULE_VALUE ))
+)
+
+IF RULE_VALUE = 'X' THEN
+(
+RULE_VALUE = ' '
+)
+
+
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' AXE_HR_SENIORITY_DT_RULE_FF - Ends' ))
+
+RETURN RULE_VALUE"

@@ -1,0 +1,46 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000036915607,"
+/* ******************************************************************
+ * Formula Name     : AXE_HR_ORIGINAL_HIRE_DT_RULE_FF
+ * Rice ID          : HCM_I030,HR_I027
+ * Formula Type     : Extract Rule
+ * Description      : Returns first seniority date of earliest row for service rule named “Lifetime Length of Service”
+ *
+ * Change History
+ * --------------
+ *
+ * Name 	                               Ver      Date         Description
+ *-----------------------------------     ------   ------------ ------------
+   Abu Thahir                             1.0	   2019-Jun-11  Initial Draft
+***************************************************************************** */
+
+
+DEFAULT FOR DATA_ELEMENTS IS EMPTY_TEXT_TEXT
+
+INPUTS ARE DATA_ELEMENTS (TEXT_TEXT)
+
+TRACE_FLAG = 'N'
+RULE_VALUE = 'X'
+
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' AXE_HR_ORIGINAL_HIRE_DT_RULE_FF - Starts' ))
+
+IF DATA_ELEMENTS.EXISTS('Person_ID') THEN
+(
+E_PERSON_ID = DATA_ELEMENTS['Person_ID']
+
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE('Person Id : '||E_PERSON_ID))
+
+RULE_VALUE = GET_VALUE_SET('AXE_ORIGINAL_HIRE_DT_VS','|=PERSON_ID='''||E_PERSON_ID||'''') 
+         
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' Original Hire Date : '||RULE_VALUE ))
+)
+
+IF RULE_VALUE = 'X' THEN
+(
+RULE_VALUE = ' '
+)
+
+
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' AXE_HR_ORIGINAL_HIRE_DT_RULE_FF - Ends' ))
+
+RETURN RULE_VALUE"

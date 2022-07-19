@@ -1,0 +1,73 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000171806277,"
+/***************************************************************************************************
+Formula Name: WCC_HR_ADP_COA_MATRIX_FF
+Formula Type: Extract Rule
+Description: Fetches Region, Branch details based on Branch Code
+Org/Developer                         Date         		Comments
+----------------------------------------------------------------------------------------------------
+Deloitte/Karthikeya Andey	       	1/20/2021   	Initial Version
+Deloitte/Karthikeya Andey	       	3/03/2021   	Updated Branch Details Logic
+***************************************************************************************************/
+DEFAULT FOR DATA_ELEMENTS IS EMPTY_TEXT_TEXT
+DEFAULT FOR PER_ASG_ATTRIBUTE6 IS ' '
+
+INPUTS ARE DATA_ELEMENTS (TEXT_TEXT)
+
+l_rule_value	= ' '
+
+l_branch_id		= ' '
+l_branch_code	= ' '
+l_branch_details= ' '
+l_region_id		= ' '
+
+l_union_code				= ' '
+l_union_code_meaning		= ' '
+l_assignment_status			= ' '
+l_assignment_status_meaning	= ' '
+
+
+IF PER_ASG_ATTRIBUTE6 WAS NOT DEFAULTED 
+THEN 
+(
+	l_branch_id 	= PER_ASG_ATTRIBUTE6
+/*
+	l_branch_code   = GET_VALUE_SET('WCC_HR_LOOKUP_DESCRIPTION_VS', '|=P_LOOKUP_TYPE='
+								||'AXEW_BRANCH_ID'
+								||'|P_LOOKUP_CODE='
+								||l_branch_id
+								||'|')
+	l_branch_details = TRIM(l_branch_id)||'-'||TRIM(l_branch_code)
+*/
+	l_branch_code    = GET_LOOKUP_MEANING('AXEW_BRANCH_ID',l_branch_id)
+	l_branch_details = l_branch_code
+		
+	l_region_id	 	= GET_TABLE_VALUE('AXEW_HCM_WESCO_COA_MATRIX_UDT', 'AXEW_REGION_ID', TRIM(l_branch_id), ' ')
+	
+	IF l_region_id  =  '0'
+	THEN (l_region_id = ' ')	
+)
+
+IF(DATA_ELEMENTS.EXISTS('Union_Code')) THEN
+(
+	l_union_code = DATA_ELEMENTS['Union_Code']
+	l_union_code_meaning = GET_LOOKUP_MEANING('WCC_HR_ADP_US_PAYROLL_LKP',l_union_code)
+)
+
+IF(DATA_ELEMENTS.EXISTS('Employement_Status_Code')) THEN
+(
+	l_assignment_status = SUBSTR(DATA_ELEMENTS['Employement_Status_Code'], 1, 30)
+	l_assignment_status_meaning = GET_VALUE_SET('WCC_HR_LOOKUP_DESCRIPTION_VS', '|=P_LOOKUP_TYPE='
+								||'WCC_HR_ADP_US_PAYROLL_LKP'
+								||'|P_LOOKUP_CODE='
+								||l_assignment_status
+								||'|')
+)
+
+
+l_rule_value	= TRIM(l_branch_id)||'^'||TRIM(l_region_id)||'^'||TRIM(l_branch_details)||'^'||TRIM(l_union_code_meaning)||'^'||TRIM(l_assignment_status_meaning)
+
+RULE_VALUE = TRIM(l_rule_value)
+
+RETURN RULE_VALUE
+"

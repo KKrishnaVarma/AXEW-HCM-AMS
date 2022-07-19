@@ -1,0 +1,51 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000171806286,"
+/***************************************************************************************************
+Formula Name: WCC_HR_EMPLOYEE_LE_ORG_FF
+Formula Type: Extract Rule
+Description: Identifies if Employee belongs to Wesco or Anixter
+Extract Name: 
+Org/Developer                         Date         		Comments
+----------------------------------------------------------------------------------------------------
+Deloitte/Karthikeya Andey	       	2/19/2021   	Initial version
+Deloitte/Karthikeya Andey	       	4/15/2021   	Updated code to use get value set
+***************************************************************************************************/
+DEFAULT FOR PER_ASG_ORG_LEGAL_EMPLOYER_NAME  IS ' '
+DEFAULT FOR PER_LEMP_LEGAL_ENTITY_IDENTIFIER  IS ' '
+DEFAULT FOR PER_LEGAL_EMPLOYER_NAME  IS ' '
+
+INPUTS ARE DATA_ELEMENTS (TEXT_TEXT)
+
+l_rule_value				= ' '
+l_legal_entity_identifer	= ' ' 
+l_legal_employer			= ' '
+l_lookup					= ' '
+
+IF PER_LEMP_LEGAL_ENTITY_IDENTIFIER WAS NOT DEFAULTED AND PER_LEGAL_EMPLOYER_NAME WAS NOT DEFAULTED
+THEN 
+(
+	
+	l_legal_entity_identifer	= PER_LEMP_LEGAL_ENTITY_IDENTIFIER
+	l_legal_employer 			= PER_LEGAL_EMPLOYER_NAME
+	/*l_lookup					= GET_LOOKUP_MEANING('WCC_HR_WESCO_LEGAL_EMP_LKP',l_legal_entity_identifer)*/
+	
+	l_lookup   					= GET_VALUE_SET('WCC_HR_LOOKUP_CODE_VS', '|=P_LOOKUP_TYPE='
+												||'WCC_HR_WESCO_LEGAL_EMP_LKP'
+												||'|P_LOOKUP_CODE='
+												||l_legal_employer
+												||'|')
+												
+	IF l_lookup||'abc' = 'abc' 
+	THEN
+	(
+		l_rule_value = 'Anixter'
+	)
+	ELSE
+	(
+		l_rule_value = 'Wesco'
+	)
+)
+
+rule_value = TRIM(l_rule_value)
+
+RETURN rule_value"

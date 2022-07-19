@@ -1,0 +1,50 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000171806294,"
+/***************************************************************************************************
+Formula Name: WCC_HR_SALES_INDICATOR_FF
+Formula Type: Extract Rule
+Description: Fetches Sales Indicator Flag Value for the Employee 
+Org/Developer                         Date         		Comments
+----------------------------------------------------------------------------------------------------
+Deloitte/Karthikeya Andey	       	4/16/2021   	Initial version
+***************************************************************************************************/
+DEFAULT FOR PER_ASG_JOB_ID IS 0
+DEFAULT FOR PER_ASG_JOB_FUNCTION_CODE IS ' '
+DEFAULT FOR PER_JOB_FAMILY_NAME IS ' '
+l_effective_date = TRUNC(GET_CONTEXT(EFFECTIVE_DATE, '0001/01/01 00:00:00'(date)))
+
+l_rule_value		= 'Non-Sales Personnel'
+l_job_function_code	= ' '
+l_job_function		= ' '
+l_job_family		= ' '
+l_val1				= ' '
+l_val2				= ' '
+l_job_id 			= 0
+
+
+IF PER_ASG_JOB_ID WAS NOT DEFAULTED THEN (
+              l_job_id = PER_ASG_JOB_ID
+)
+
+
+CHANGE_CONTEXTS(JOB_ID = l_job_id, EFFECTIVE_DATE = l_effective_date)
+(
+	IF PER_ASG_JOB_FUNCTION_CODE WAS NOT DEFAULTED AND PER_JOB_FAMILY_NAME WAS NOT DEFAULTED
+	THEN (
+			l_job_family 		= PER_JOB_FAMILY_NAME
+			l_job_function_code	= PER_ASG_JOB_FUNCTION_CODE
+			l_job_function 		= GET_LOOKUP_MEANING('JOB_FUNCTION_CODE',l_job_function_code)
+			
+			l_val1 = GET_LOOKUP_MEANING('WCC_HR_SALES_PERSONNEL_LKP', l_job_family)
+			l_val2 = GET_LOOKUP_MEANING('WCC_HR_SALES_PERSONNEL_LKP', l_job_function)
+			
+			IF l_job_family = l_val1 AND l_job_function = l_val2
+			THEN (
+					l_rule_value = 'Sales Personnel'
+				)
+		)
+)
+
+rule_value = TRIM(l_rule_value)
+
+RETURN rule_value"

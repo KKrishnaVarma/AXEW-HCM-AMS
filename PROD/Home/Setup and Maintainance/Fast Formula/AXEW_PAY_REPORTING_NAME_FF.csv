@@ -1,0 +1,37 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000241178528,"
+/* ******************************************************************
+ * Formula Name     : AXEW_PAY_REPORTING_NAME_FF
+ * Formula Type     : Extract Rule
+ * Description      : Returns payroll reporting name
+ *
+ * Change History
+ * --------------
+ *
+ * Name 	                          Ver      Date              Description
+ *-----------------------------------     ------   ------------ ------------
+   Manish                            1.0	   2021-DEC-15      Initial Draft
+************************************************************************** */
+
+
+DEFAULT FOR DATA_ELEMENTS IS EMPTY_TEXT_TEXT
+
+INPUTS ARE DATA_ELEMENTS (TEXT_TEXT)
+
+TRACE_FLAG = 'N'
+RULE_VALUE = ' '
+
+IF DATA_ELEMENTS.EXISTS('Payroll_Term_ID') THEN  
+(
+S_PAYROLL_TERM_ID = DATA_ELEMENTS['Payroll_Term_ID']
+
+
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE('Payroll reporting Name : '||S_PAYROLL_TERM_ID))
+
+RULE_VALUE = GET_VALUE_SET('AXE_PAY_REPORTING_NAME_VS','|=PAYROLL_TERM_ID='''||S_PAYROLL_TERM_ID||'''')  
+
+           
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' Reporting Name : '||RULE_VALUE ))
+)
+
+RETURN RULE_VALUE"

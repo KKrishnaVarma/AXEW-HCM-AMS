@@ -1,0 +1,81 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000063997111,"
+/*********************************************************************************************
+Deloitte Changes Log
+**********************************************************************************************
+FORMULA NAME: AXE_HCM_COMP_BONUS_TARGET_PRORATION_FF
+FORMULA TYPE: Compensation Default and Override
+DESCRIPTION : This formula determines the bonus target prorated amount for Bonus Payout Plan                                        
+Name             Date                  Comments
+----------------------------------------------------------------------------------------------
+Tanvi Khadse     14-May-2020           Initial Version
+**********************************************************************************************/
+
+default for PER_ASG_LEGISLATION_CODE is 'XX'
+default for PER_ASG_REL_DATE_START is '1951/01/01 00:00:00'(date)
+default for PER_ASG_REL_ACTUAL_TERMINATION_DATE is '4712/12/31 00:00:00'(date)
+default for CMP_IV_PLAN_END_DATE is '4712/12/31 00:00:00' (date)
+default for CMP_IV_PLAN_START_DATE is '1901/01/01 00:00:00' (date)
+default_data_value for ELEMENT_ENTRY_RGE_BASE_ELEMENT_NAME  is 'XX'
+default_data_value for ELEMENT_ENTRY_RGE_BASE_VALUE_NAME  is 'XX'
+default_data_value for ELEMENT_ENTRY_RGE_VALUE  is '0'
+default_data_value for ELEMENT_ENTRY_RGE_VALUE_EFFECTIVE_START_DATE is '0001/01/01 00:00:00' (date)
+default_data_value for ELEMENT_ENTRY_RGE_VALUE_EFFECTIVE_END_DATE is '4712/12/31 00:00:00' (date)
+default_data_value for ELEMENT_ENTRY_RGE_INPUT_CURRENCY_CODE is 'XX'
+
+
+inputs are CMP_IV_PLAN_START_DATE (date), CMP_IV_PLAN_END_DATE (date)
+
+l_debug = 'Y'
+l_eff_date = GET_CONTEXT(EFFECTIVE_DATE,to_date('4712/12/31 00:00:00'))
+l_default_value = 0
+l_plan_start_date = GREATEST(CMP_IV_PLAN_START_DATE,PER_ASG_REL_DATE_START)
+l_plan_end_date = LEAST(PER_ASG_REL_ACTUAL_TERMINATION_DATE,CMP_IV_PLAN_END_DATE)
+l_arr_index =1
+l_bonus_prorated_amount = 0
+l_days = 0
+l_plan_days = 0
+
+change_contexts(START_DATE = l_plan_start_date,END_DATE = l_plan_end_date)
+(
+ while ELEMENT_ENTRY_RGE_VALUE_EFFECTIVE_START_DATE.exists(l_arr_index) loop
+ (
+  if (ELEMENT_ENTRY_RGE_VALUE_EFFECTIVE_START_DATE[l_arr_index] <= l_plan_end_date
+      and ELEMENT_ENTRY_RGE_VALUE_EFFECTIVE_END_DATE[l_arr_index] >= l_plan_start_date
+      and ELEMENT_ENTRY_RGE_BASE_ELEMENT_NAME[l_arr_index] = 'AXE '||PER_ASG_LEGISLATION_CODE||' Bonus Target '||ELEMENT_ENTRY_RGE_INPUT_CURRENCY_CODE[l_arr_index] 
+	  and ELEMENT_ENTRY_RGE_BASE_VALUE_NAME[l_arr_index] = 'Amount') then
+  (
+   l_days = DAYS_BETWEEN(LEAST(ELEMENT_ENTRY_RGE_VALUE_EFFECTIVE_END_DATE[l_arr_index],l_plan_end_date),GREATEST(ELEMENT_ENTRY_RGE_VALUE_EFFECTIVE_START_DATE[l_arr_index],l_plan_start_date))+1
+   
+   l_plan_days = DAYS_BETWEEN(CMP_IV_PLAN_END_DATE,CMP_IV_PLAN_START_DATE)+1
+   
+   if (l_plan_days <> 0) then
+   (
+    l_bonus_prorated_amount = l_bonus_prorated_amount + ROUND((to_number(ELEMENT_ENTRY_RGE_VALUE[l_arr_index])*l_days/l_plan_days),2)
+   )
+   
+    if (l_debug = 'Y') then
+	(
+	 l_log = SET_LOG('ELEMENT_ENTRY_RGE_VALUE_EFFECTIVE_START_DATE:'||to_char(ELEMENT_ENTRY_RGE_VALUE_EFFECTIVE_START_DATE[l_arr_index]))
+	 l_log = SET_LOG('ELEMENT_ENTRY_RGE_VALUE_EFFECTIVE_END_DATE:'||to_char(ELEMENT_ENTRY_RGE_VALUE_EFFECTIVE_END_DATE[l_arr_index]))
+	 l_log = SET_LOG('ELEMENT_ENTRY_RGE_BASE_ELEMENT_NAME:'||ELEMENT_ENTRY_RGE_BASE_ELEMENT_NAME[l_arr_index])
+	 l_log = SET_LOG('ELEMENT_ENTRY_RGE_BASE_VALUE_NAME:'||ELEMENT_ENTRY_RGE_BASE_VALUE_NAME[l_arr_index])
+	 l_log = SET_LOG('l_days:'||to_char(l_days))
+	 l_log = SET_LOG('l_plan_days:'||to_char(l_plan_days))
+	 l_log = SET_LOG('l_bonus_prorated_amount:'||to_char(l_bonus_prorated_amount))
+	 l_log = SET_LOG('l_plan_start_date:'||to_char(l_plan_start_date))
+	 l_log = SET_LOG('l_plan_end_date:'||to_char(l_plan_end_date))
+	 l_log = SET_LOG('PER_ASG_REL_DATE_START:'||to_char(PER_ASG_REL_DATE_START))
+	 l_log = SET_LOG('PER_ASG_REL_ACTUAL_TERMINATION_DATE:'||to_char(PER_ASG_REL_ACTUAL_TERMINATION_DATE))
+	)
+  )
+  l_arr_index = l_arr_index + 1
+ )
+)
+
+l_default_value = l_bonus_prorated_amount
+
+return l_default_value
+
+
+"

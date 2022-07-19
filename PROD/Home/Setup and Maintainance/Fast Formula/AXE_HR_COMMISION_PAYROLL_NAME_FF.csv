@@ -1,0 +1,40 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000093869488,"
+/* ******************************************************************
+ * Formula Name     : AXE_HR_COMMISION_PAYROLL_NAME_FF
+ * Formula Type     : Extract Rule
+ * Description      : Returns the Payroll Reporting Name.
+ *
+ * Change History
+ * --------------
+ *
+ * Name 	                          Ver      Date              Description
+ *-----------------------------------     ------   ------------ ------------
+   Manish                            1.0	   2021-March-12    Initial Draft
+************************************************************************** */
+
+
+DEFAULT FOR DATA_ELEMENTS IS EMPTY_TEXT_TEXT
+
+INPUTS ARE DATA_ELEMENTS (TEXT_TEXT)
+
+TRACE_FLAG = 'N'
+RULE_VALUE = 'X'
+L_EFFECTIVE_DATE =  get_context(effective_date, '0001/01/01 00:00:00'(date))
+DATE_ASSIGNED =  '1901/01/01 00:00:00' (date)
+
+
+
+IF DATA_ELEMENTS.EXISTS('Payroll_Term_Id') THEN
+(
+S_PAYROLL_TERM_ID = DATA_ELEMENTS['Payroll_Term_Id']
+DATE_ASSIGNED = L_EFFECTIVE_DATE
+
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE('Payroll Term Id : '||S_PAYROLL_TERM_ID))
+
+RULE_VALUE = GET_VALUE_SET('AXE_PAYROLL_NAME_VS','|=PAYROLL_TERM_ID='''||S_PAYROLL_TERM_ID||''''||'|Effective_date='||to_char(DATE_ASSIGNED,'YYYY-MM-DD')||'''')
+           
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' Commision Payroll Name : '||RULE_VALUE ))
+)
+
+RETURN RULE_VALUE"

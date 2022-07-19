@@ -1,0 +1,36 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000171806313,"
+/***************************************************************************************************
+Formula Name: WCC_HR_ERP_DEF_EXP_AC_SEG1_FF
+Formula Type: Extract Rule
+Description : Fetches Default Expense Account Segment1 Legal Employer Code
+Org/Developer                         Date         		Comments
+----------------------------------------------------------------------------------------------------
+Deloitte/Karthikeya Andey	       	6/23/2021   	Initial version
+***************************************************************************************************/
+DEFAULT FOR DATA_ELEMENTS IS EMPTY_TEXT_TEXT
+
+INPUTS ARE DATA_ELEMENTS (TEXT_TEXT)
+
+l_rule_value	= ' '
+l_legal_emp		= ' '
+l_segment1		= ' '
+
+
+IF(DATA_ELEMENTS.EXISTS('LEGAL_ID')) THEN
+(
+	l_legal_emp 	 = DATA_ELEMENTS['LEGAL_ID']
+
+	l_segment1	    = GET_VALUE_SET('WCC_HR_LOOKUP_CODE_VS', '|=P_LOOKUP_TYPE='
+								||'WCC_HR_ERP_DEF_EXP_AC_SEG1_LKP'
+								||'|P_LOOKUP_CODE='
+								||l_legal_emp
+								||'|')
+	
+	l_rule_value	= TRIM(l_segment1)
+)
+
+RULE_VALUE = TRIM(l_rule_value)
+
+RETURN RULE_VALUE 
+ "

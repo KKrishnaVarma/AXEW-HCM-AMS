@@ -1,0 +1,59 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000036915608,"
+/* ******************************************************************
+ * Formula Name     : AXE_HR_DEPT_SITE_OVERRIDE_RULE_FF
+ * Rice ID          : HCM_I046
+ * Formula Type     : Extract Rule
+ * Description      : To get Site Override value based on Department Code 
+ *
+ * Change History
+ * --------------
+ *
+ * Name 	                               Ver      Date         Description
+ *-----------------------------------     ------   ------------ ------------
+   Aditya Patial 			               1.0	   2019-Jul-31  Initial Draft
+***************************************************************************** */
+
+
+
+DEFAULT FOR DATA_ELEMENTS IS EMPTY_TEXT_TEXT
+
+
+INPUTS ARE DATA_ELEMENTS (TEXT_TEXT)
+
+TRACE_FLAG = 'N'
+L_PERSON_ID = 0
+L_SITE_OVER_RIDE = 'NO DATA'
+L_SITE_OVER_RIDE_VAL = 'NO DATA'
+L_DEPT = 'NO DATA'
+RULE_VALUE = '00000'
+
+
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' AXE_HR_DEPT_SITE_OVERRIDE_RULE_FF - Starts '))
+
+IF (DATA_ELEMENTS.EXISTS('Site')) THEN (L_SITE_OVER_RIDE_VAL = DATA_ELEMENTS['Site'])
+
+IF (DATA_ELEMENTS.EXISTS('Department')) THEN 
+(
+
+L_DEPT = SUBSTR(DATA_ELEMENTS['Department'],1,5)
+
+
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' Department is '||L_DEPT ))
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' Site is '||L_SITE_OVER_RIDE_VAL ))
+
+ L_SITE_OVER_RIDE=GET_TABLE_VALUE('AXE_HCM_OPERATIONS_TEAM_BY_DEPT_CODE', 'DEPT_CODE', L_DEPT, '00000') 
+
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' L_SITE_OVER_RIDE '|| L_SITE_OVER_RIDE ))
+
+IF L_SITE_OVER_RIDE <> '00000' THEN
+	(
+	RULE_VALUE = L_SITE_OVER_RIDE_VAL
+	)
+
+)
+
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' AXE_HR_DEPT_SITE_OVERRIDE_RULE_FF - Ends '))
+
+RETURN RULE_VALUE 
+"

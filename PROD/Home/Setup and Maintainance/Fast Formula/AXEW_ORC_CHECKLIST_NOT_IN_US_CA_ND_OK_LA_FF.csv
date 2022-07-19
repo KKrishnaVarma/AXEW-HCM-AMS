@@ -1,0 +1,47 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000159808219,"
+/*************************************************************************************
+Formula Name:  AXEW_ORC_CHECKLIST_NOT_IN_US_CA_ND_OK_LA_FF
+FORMULA TYPE:  Participation And Rate Eligibility
+DESCRIPTION:   Returns Y if candidate Country is US and State of Work Location is not in CA, ND, OK, LA 
+Org/Developer                         Date         		Comments
+----------------------------------------------------------------------------------------------------
+Deloitte/Karthikeya Andey	    6/22/2021   	Initial version
+***************************************************************************************************/
+
+/*** Default : Database Items ***/
+DEFAULT FOR PER_ASG_LOC_COUNTRY IS ' '
+DEFAULT FOR PER_ASG_LOC_REGION2 IS ' '
+DEFAULT FOR PER_ASG_WORK_AT_HOME IS ' '
+DEFAULT FOR PER_ASG_PRIMARY_ADDRESS_TYPE IS ' '
+DEFAULT FOR PER_PER_PERSON_ADD_USAGE_COUNTRY IS ' '
+DEFAULT FOR PER_PER_PERSON_ADD_USAGE_REGION2 IS ' '
+
+ELIGIBLE	= 'N'
+l_country	= ' '
+l_state		= ' '
+
+
+IF PER_ASG_WORK_AT_HOME WAS NOT DEFAULTED AND PER_ASG_WORK_AT_HOME = 'Y' THEN
+(
+	IF PER_ASG_PRIMARY_ADDRESS_TYPE WAS NOT DEFAULTED THEN
+	(
+		CHANGE_CONTEXTS(ADDRESS_TYPE = PER_ASG_PRIMARY_ADDRESS_TYPE)
+		(
+			l_country	= PER_PER_PERSON_ADD_USAGE_COUNTRY
+			l_state		= PER_PER_PERSON_ADD_USAGE_REGION2
+		)
+	)
+)ELSE(
+	IF PER_ASG_LOC_COUNTRY WAS NOT DEFAULTED AND PER_ASG_LOC_REGION2 WAS NOT DEFAULTED
+	THEN 
+	(
+		l_country	= PER_ASG_LOC_COUNTRY
+		l_state		= PER_ASG_LOC_REGION2
+	)
+)
+
+IF l_country = 'US' AND l_state != 'CA' AND l_state != 'ND' AND l_state != 'OK' AND l_state != 'LA'
+THEN ELIGIBLE = 'Y'
+
+RETURN ELIGIBLE"

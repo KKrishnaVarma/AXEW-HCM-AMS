@@ -1,0 +1,35 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000036915609,"
+/* ******************************************************************
+ * Formula Name     : AXE_HR_PAYROLL_REPORTING_NAME_RULE_FF
+ * Formula Type     : Extract Rule
+ * Description      : Returns the Payroll Reporting Name.
+ *
+ * Change History
+ * --------------
+ *
+ * Name 	                          Ver      Date          Description
+ *-----------------------------------     ------   ------------ ------------
+   Abu Thahir                             1.0	   2019-July-22  Initial Draft
+************************************************************************** */
+
+
+DEFAULT FOR DATA_ELEMENTS IS EMPTY_TEXT_TEXT
+
+INPUTS ARE DATA_ELEMENTS (TEXT_TEXT)
+
+TRACE_FLAG = 'N'
+RULE_VALUE = 'X'
+
+IF DATA_ELEMENTS.EXISTS('Payroll_Term_Id') THEN
+(
+S_PAYROLL_TERM_ID = DATA_ELEMENTS['Payroll_Term_Id']
+
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE('Payroll Term Id : '||S_PAYROLL_TERM_ID))
+
+RULE_VALUE = GET_VALUE_SET('AXE_PAYROLL_REPORTING_NAME_VS','|=PAYROLL_TERM_ID='''||S_PAYROLL_TERM_ID||'''') 
+           
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' Payroll Reporting Name : '||RULE_VALUE ))
+)
+
+RETURN RULE_VALUE"

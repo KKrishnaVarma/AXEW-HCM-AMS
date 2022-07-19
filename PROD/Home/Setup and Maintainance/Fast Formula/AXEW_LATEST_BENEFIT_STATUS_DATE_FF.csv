@@ -1,0 +1,36 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000241178527,"
+/* ******************************************************************
+ * Formula Name     : AXEW_LATEST_BENEFIT_STATUS_DATE_FF
+ * Formula Type     : Extract Rule
+ * Description      : Returns latest Active/Inactive Benefit Status Date
+ *
+ * Change History
+ * --------------
+ *
+ * Name 	                          Ver      Date              Description
+ *-----------------------------------     ------   ------------ ------------
+   Manish                            1.0	   2021-Nov-24      Initial Draft
+************************************************************************** */
+
+
+DEFAULT FOR DATA_ELEMENTS IS EMPTY_TEXT_TEXT
+
+INPUTS ARE DATA_ELEMENTS (TEXT_TEXT)
+
+TRACE_FLAG = 'N'
+RULE_VALUE = ' '
+
+IF DATA_ELEMENTS.EXISTS('Person_id') THEN
+(
+PERSON_ID = DATA_ELEMENTS['Person_id']
+
+
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE('Person_id : '||PERSON_ID))
+
+RULE_VALUE = GET_VALUE_SET('AXE_HR_LATEST_BENEFIT_STATUS_VS','|=PERSON_ID='''||PERSON_ID||'''')
+           
+IF TRACE_FLAG = 'Y' THEN (RET = ESS_LOG_WRITE(' Salary Basis : '||RULE_VALUE ))
+)
+
+RETURN RULE_VALUE"

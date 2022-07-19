@@ -1,0 +1,39 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000171806296,"
+/****************************************************************************************************************************************
+Formula Name: WCC_HR_ASG_STATUS_EFF_DATE_FF
+Formula Type: Extract Rule
+Description : Fast Formula to fetch Employee Assignment Status Effective Date
+Add-Comments: If Extract is LDG or LE specific then if existing Employee is Rehired or Global Transferred into differnt LDG or LE 
+			  then new Active Assignment dates will be extracted. Hence for Inactive Employees defaulting status date to (Term Date + 1).
+Org/Developer                         Date         		Comments
+-----------------------------------------------------------------------------------------------------------------------------------------
+Deloitte/Karthikeya Andey	       	4/22/2021   	Initial version
+*****************************************************************************************************************************************/
+DEFAULT FOR PER_ASG_REL_ACTUAL_TERMINATION_DATE IS '0001/01/01 00:00:00'(date)
+
+l_asg_status_eff_date = ' '
+
+l_person_id         = GET_CONTEXT(PERSON_ID,1)
+l_person_id_ch      = TO_CHAR(l_person_id)
+
+l_effective_date 	= TRUNC(GET_CONTEXT(EFFECTIVE_DATE, '0001/01/01 00:00:00'(date)))
+l_effective_date_ch	= TO_CHAR(l_effective_date)
+
+
+IF PER_ASG_REL_ACTUAL_TERMINATION_DATE WAS NOT DEFAULTED
+THEN 
+(
+	l_termination_date		= PER_ASG_REL_ACTUAL_TERMINATION_DATE
+	l_asg_status_eff_date	= TO_CHAR(ADD_DAYS(l_termination_date, 1), 'YYYY-MM-DD')
+)ELSE
+(
+	l_asg_status_eff_date = GET_VALUE_SET('WCC_HR_ASG_STATUS_EFF_DATE_VS', '|=PER_ID='
+									||l_person_id_ch
+									||'|EFF_DATE='
+									||l_effective_date_ch
+									||'|')
+)
+rule_value = TRIM(l_asg_status_eff_date)				
+
+RETURN rule_value"

@@ -1,0 +1,50 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000171806307,"
+/***************************************************************************************************
+Formula Name: WCC_HR_UBS_TERMINATION_ID_FF
+Formula Type: Extract Rule
+Description : Fetches Termination ID
+Org/Developer                         Date         		Comments
+----------------------------------------------------------------------------------------------------
+Deloitte/Shruti Krishnan	       	4/29/2021   	Initial version
+***************************************************************************************************/
+DEFAULT FOR PER_ASG_REL_ACTUAL_TERMINATION_DATE IS '0001/01/01 00:00:00'(date)
+DEFAULT FOR PER_EMP_TERMINATION_ACTION_CODE IS ' '
+DEFAULT FOR PER_EMP_TERMINATION_REASON_CODE IS ' '
+
+DEFAULT FOR PER_EMP_TERMINATION_ACTION_NAME IS ' '
+DEFAULT FOR PER_EMP_TERMINATION_REASON IS ' '
+
+l_rule_value			= ' '
+l_value					= ' '
+l_effective_date 		= TRUNC(GET_CONTEXT(EFFECTIVE_DATE, '0001/01/01 00:00:00'(date)))
+
+IF PER_ASG_REL_ACTUAL_TERMINATION_DATE WAS NOT DEFAULTED
+THEN 
+(
+	l_termination_date	= PER_ASG_REL_ACTUAL_TERMINATION_DATE
+	l_term_action_code	= PER_EMP_TERMINATION_ACTION_CODE
+	l_term_reason_code  = PER_EMP_TERMINATION_REASON_CODE
+	IF TO_CHAR(l_termination_date, 'YYYY/MM/DD') < TO_CHAR(l_effective_date, 'YYYY/MM/DD')
+	THEN (
+	IF l_term_action_code = 'DEATH' or l_term_action_code = 'REDUCTION_FORCE' or l_term_action_code = 'RETIREMENT'
+	THEN (
+		l_value = GET_LOOKUP_MEANING('WCC_HR_UBS_TERMINATION_ID_LKP', l_term_action_code)
+	)
+	ELSE (
+		l_value = GET_LOOKUP_MEANING('WCC_HR_UBS_TERMINATION_ID_LKP', l_term_reason_code)
+	)
+	
+	IF l_value||'abc' = 'abc'
+	THEN(
+		l_rule_value = 'Terminated' 
+	)ELSE (
+		l_rule_value = l_value
+	)
+	
+))
+
+rule_value = TRIM(l_rule_value)
+
+RETURN rule_value 
+ "

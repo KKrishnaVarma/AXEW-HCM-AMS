@@ -1,0 +1,95 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000063997118,"
+/************************************************************************************************
+Deloitte Changes Log
+*************************************************************************************************
+FORMULA NAME: AXE_HCM_COMP_SALARY_PRORATED_ELIGIBLE_SALARY_FF
+FORMULA TYPE: Compensation Default and Override
+DESCRIPTION : This formula determines the prorated eligible salary for Annual Salary Review Plan                                        
+Name             Date                  Comments
+-------------------------------------------------------------------------------------------------
+Tanvi Khadse     27-May-2020           Initial Version
+Sonu Haldar      25-Jan-2021           Replace l_plan_days with 365 for proration factor calc
+************************************************************************************************/
+inputs are CMP_IV_PLAN_START_DATE (date),CMP_IV_PLAN_END_DATE (date)
+
+default for CMP_ASSIGNMENT_SALARY_BASIS_CODE is 'XX'
+default for CMP_ASSIGNMENT_SALARY_AMOUNT is 0
+default for CMP_ASSIGNMENT_SALARY_ANNUALIZATION_FACTOR is 0
+default for PER_ASG_FTE_VALUE is 1
+/*default for PER_ASG_NORMAL_HOURS is 0*/
+default for CMP_IV_PLAN_START_DATE is '1901/01/01 00:00:00' (date)
+default for CMP_IV_PLAN_END_DATE is '4712/12/31 00:00:00' (date)
+default for CMP_ASSIGNMENT_SALARY_DATE_FROM is '1901/01/01 00:00:00' (date)
+
+l_debug = 'N'
+l_default_value = 0
+l_elig_sal = 0
+l_annual_sal = 0
+l_us_ldg_id = 0
+l_days = 0
+l_plan_days = 0
+l_arr_index = 1
+l_proration_factor = 1
+l_sal_date_from = '1951/01/01 00:00:00' (date)
+l_sal_date_from_char = 'XX'
+l_assignment_id = GET_CONTEXT(HR_ASSIGNMENT_ID,0)
+l_udt_name = 'AXE_HCM_COMP_SALARY_ACTION_PRORATION_UDT'
+l_col_name = 'PRORATION_FLAG'
+
+change_contexts(EFFECTIVE_DATE = CMP_IV_PLAN_END_DATE)
+(
+ if (CMP_ASSIGNMENT_SALARY_BASIS_CODE = 'HOURLY') then
+ (
+  l_annual_sal = CMP_ASSIGNMENT_SALARY_AMOUNT*2080
+ )
+ if (CMP_ASSIGNMENT_SALARY_BASIS_CODE = 'ANNUAL' OR CMP_ASSIGNMENT_SALARY_BASIS_CODE = 'MONTHLY') then
+ (
+  l_annual_sal = CMP_ASSIGNMENT_SALARY_AMOUNT*CMP_ASSIGNMENT_SALARY_ANNUALIZATION_FACTOR*PER_ASG_FTE_VALUE
+ )
+ 
+ if (CMP_ASSIGNMENT_SALARY_DATE_FROM <= CMP_IV_PLAN_START_DATE) then
+ (
+  l_elig_sal = l_annual_sal
+ )
+ else
+ (  
+  l_sal_date_from_char = GET_VALUE_SET('AXE_HCM_COMP_SALARY_PRORATION_DATE_VS','|=P_ASSIGNMENT_ID='''||to_char(l_assignment_id)||''''||'|P_CYCLE_START_DATE='''||to_char(CMP_IV_PLAN_START_DATE,'YYYY/MM/DD')||''''||'|P_CYCLE_END_DATE='''||to_char(CMP_IV_PLAN_END_DATE,'YYYY/MM/DD')||''''||'|P_UDT_NAME='''||l_udt_name||''''||'|P_COL_NAME='''||l_col_name||'''')
+  						 
+  if isnull(l_sal_date_from_char) = 'Y' then
+  (
+   l_sal_date_from = TO_DATE(l_sal_date_from_char,'YYYY/MM/DD')
+   l_plan_days = DAYS_BETWEEN(CMP_IV_PLAN_END_DATE,CMP_IV_PLAN_START_DATE)+1
+   if (l_plan_days <> 0) then
+   (
+    l_proration_factor = (DAYS_BETWEEN(CMP_IV_PLAN_END_DATE,l_sal_date_from)+1)/365
+    l_elig_sal = l_annual_sal*l_proration_factor
+   )
+  ) 
+  else
+  (
+   l_elig_sal = l_annual_sal
+  )  
+ ) 
+)
+
+if (l_debug = 'Y') then
+	(
+	 l_log = SET_LOG('l_annual_sal:'||to_char(l_annual_sal))
+	 l_log = SET_LOG('CMP_IV_PLAN_START_DATE:'||to_char(CMP_IV_PLAN_START_DATE,'YYYY/MM/DD'))
+	 l_log = SET_LOG('CMP_IV_PLAN_END_DATE:'||to_char(CMP_IV_PLAN_END_DATE,'YYYY/MM/DD'))
+	 l_log = SET_LOG('l_assignment_id:'||to_char(l_assignment_id))
+	 l_log = SET_LOG('CMP_ASSIGNMENT_SALARY_AMOUNT:'||to_char(CMP_ASSIGNMENT_SALARY_AMOUNT))
+	 /*l_log = SET_LOG('PER_ASG_NORMAL_HOURS:'||to_char(PER_ASG_NORMAL_HOURS))*/
+	 l_log = SET_LOG('CMP_ASSIGNMENT_SALARY_ANNUALIZATION_FACTOR:'||to_char(CMP_ASSIGNMENT_SALARY_ANNUALIZATION_FACTOR))
+	 l_log = SET_LOG('PER_ASG_FTE_VALUE:'||to_char(PER_ASG_FTE_VALUE))
+	 l_log = SET_LOG('CMP_ASSIGNMENT_SALARY_DATE_FROM:'||to_char(CMP_ASSIGNMENT_SALARY_DATE_FROM))
+	 l_log = SET_LOG('l_sal_date_from_char:'||l_sal_date_from_char)
+	 l_log = SET_LOG('l_sal_date_from:'||to_char(l_sal_date_from))
+	 l_log = SET_LOG('l_plan_days:'||to_char(l_plan_days))
+	 l_log = SET_LOG('l_proration_factor:'||to_char(l_proration_factor))
+	 l_log = SET_LOG('l_elig_sal:'||to_char(l_elig_sal))
+	)
+
+l_default_value = l_elig_sal 
+return l_default_value"

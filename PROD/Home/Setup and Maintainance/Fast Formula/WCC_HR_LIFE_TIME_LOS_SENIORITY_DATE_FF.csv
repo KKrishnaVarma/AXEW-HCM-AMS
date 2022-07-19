@@ -1,0 +1,25 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000171806310,"
+/***************************************************************************************************
+Formula Name: WCC_HR_LIFE_TIME_LOS_SENIORITY_DATE_FF
+Formula Type: Extract Rule
+Description : Fast Formula to fetch Employee Original Date of Hire from Seniority Dates
+Org/Developer                         Date         		Comments
+----------------------------------------------------------------------------------------------------
+Deloitte/Karthikeya Andey	       	4/30/2021   		Initial version
+***************************************************************************************************/
+l_seniority_date	 	= ' '
+l_person_id         	= GET_CONTEXT(PERSON_ID,1)
+l_person_id_ch      	= TO_CHAR(l_person_id)
+l_effective_date 		= TRUNC(GET_CONTEXT(EFFECTIVE_DATE, '0001/01/01 00:00:00'(date)))
+l_effective_date_ch		= TO_CHAR(l_effective_date)
+
+l_seniority_date 		= GET_VALUE_SET('WCC_HR_LIFE_TIME_LOS_SENIORITY_DATE_VS', '|=PER_ID='
+								||l_person_id_ch
+								||'|EFF_DATE='
+								||l_effective_date_ch
+								||'|')
+
+rule_value = TRIM(l_seniority_date)				
+
+RETURN rule_value"

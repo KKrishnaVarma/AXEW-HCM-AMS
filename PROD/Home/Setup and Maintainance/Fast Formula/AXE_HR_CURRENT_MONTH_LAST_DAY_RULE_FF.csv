@@ -1,0 +1,23 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000036915628,"
+/* ******************************************************************
+ * Formula Name     : AXE_HR_CURRENT_MONTH_LAST_DAY_RULE_FF
+ * Formula Type     : Extract Rule
+ * Description      : Returns last day of the curren month.
+ *
+ * Change History
+ * --------------
+ *
+ * Name 	                          Ver      Date          Description
+ *-----------------------------------     ------   ------------ ------------
+   Srinivas Thurakapalli              1.0	  2019-Sep-17  Initial Draft
+************************************************************************** */
+
+
+DEFAULT FOR PER_SYS_DATE_TIME IS 'DUMMY'  
+
+RULE_VALUE = TO_CHAR(LAST_DAY(TO_DATE(SUBSTR(PER_SYS_DATE_TIME,1,10),'YYYY-MM-DD')))
+
+RETURN RULE_VALUE
+
+"

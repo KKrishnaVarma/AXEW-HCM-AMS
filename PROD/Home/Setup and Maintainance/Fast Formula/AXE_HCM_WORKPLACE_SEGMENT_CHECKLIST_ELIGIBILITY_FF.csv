@@ -1,0 +1,45 @@
+﻿FORMULA_ID,FORMULA_TEXT
+300000300701209,"
+/*************************************************************************** 
+FORMULA NAME: AXE_HCM_WORKPLACE_SEGMENT_CHECKLIST_ELIGIBILITY_FF
+FORMULA TYPE: Participation and Rate Eligibility Formula 
+DESCRIPTION: This formula returns a 'Y' if the employee if new workplace segment is  'Hybrid' or 'Virtual'
+Change History: 
+Name Date Comments 
+*******************************************************************************/
+
+DEFAULT FOR PER_ASG_ATTRIBUTE11 IS ' ' 
+
+ELIGIBLE = 'N' 
+
+IF (PER_ASG_ATTRIBUTE11 = 'Hybrid')
+
+THEN(ELIGIBLE = 'Y') 
+
+ELSE IF (PER_ASG_ATTRIBUTE11 = 'Virtual') 
+
+THEN (ELIGIBLE = 'Y') 
+
+RETURN ELIGIBLE"
+300000300701209,"
+/*************************************************************************** 
+FORMULA NAME: AXE_HCM_WORKPLACE_SEGMENT_CHECKLIST_ELIGIBILITY_FF
+FORMULA TYPE: Participation and Rate Eligibility Formula 
+DESCRIPTION: This formula returns a 'Y' if the employee if new workplace segment is  'Hybrid' or 'Virtual'
+Change History: 
+Name Date Comments 
+*******************************************************************************/
+
+DEFAULT FOR PER_ASG_ATTRIBUTE11 IS ' ' 
+
+ELIGIBLE = 'N' 
+
+IF (PER_ASG_ATTRIBUTE11 = 'Hybrid')
+
+THEN(ELIGIBLE = 'Y') 
+
+ELSE IF (PER_ASG_ATTRIBUTE11 = 'Virtual') 
+
+THEN (ELIGIBLE = 'Y') 
+
+RETURN ELIGIBLE"
