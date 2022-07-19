@@ -1,6 +1,4 @@
-﻿FORMULA_ID,FORMULA_TEXT
-300000168530076,"
-/******************************************************************************************************************************************************************************************
+﻿/******************************************************************************************************************************************************************************************
 Formula Name: AXEW_AXE_ADJ_LOS_SENIORITY_DATE_FF
 Formula Type: Employment Seniority Date Adjustment
 Description : Calculate Adjusted Length of Service Seniority Date From AXEW_SERVICE_DATES Person EIT Value
@@ -95,4 +93,4 @@ IF (TO_CHAR(eff_date, 'YYYY-MM-DD') = TO_CHAR(PER_ASG_REL_DATE_START, 'YYYY-MM-D
 	)
 )
 
-RETURN eff_date, seniority_adjust_comment, seniority_adjust_in_days"
+RETURN eff_date, seniority_adjust_comment, seniority_adjust_in_days
